@@ -4,21 +4,21 @@ const CryptoJs = require("crypto-js");
 //const utf8 = require("utf8");
 
 class LyraCrypto {
-  static fromHexString(hexString: string) {
+  private static fromHexString(hexString: string) {
     var mt = hexString.match(/.{1,2}/g);
     if (mt !== null)
       return new Uint8Array(mt.map((byte) => parseInt(byte, 16)));
     else throw new Error("no match found.");
   }
 
-  static toHexString(bytes: Uint8Array) {
+  private static toHexString(bytes: Uint8Array) {
     return bytes.reduce(
       (str, byte) => str + byte.toString(16).padStart(2, "0"),
       ""
     );
   }
 
-  static concatTypedArrays(a: Uint8Array, b: Uint8Array) {
+  private static concatTypedArrays(a: Uint8Array, b: Uint8Array) {
     // a, b TypedArray of same type
     const c = new Uint8Array(a.length + b.length);
     c.set(a, 0);
@@ -26,35 +26,35 @@ class LyraCrypto {
     return c;
   }
 
-  static sliceTypedArrays(a: Uint8Array, offset: number, len: number) {
+  private static sliceTypedArrays(a: Uint8Array, offset: number, len: number) {
     // a, TypedArray, from offset with len
     return a.slice(offset, offset + len);
   }
 
-  static sha256(hexString: string) {
+  private static sha256(hexString: string) {
     // SJCL(Stanford JavaScript Crypto Library) provider sample
     const md = new KJUR.crypto.MessageDigest({ alg: "sha256", prov: "sjcl" }); // sjcl supports sha256 only
     return md.digestHex(hexString);
   }
 
-  static checksum(data: Uint8Array) {
+  private static checksum(data: Uint8Array) {
     const hash1 = this.sha256(this.toHexString(data));
     const hash2 = this.sha256(hash1);
     const buff = hash2.substring(0, 8);
     return buff;
   }
 
-  static lyraEncPvt(hex: string) {
+  private static lyraEncPvt(hex: string) {
     return this.lyraEnc(hex);
   }
 
-  static lyraEncPub(hex: string) {
+  private static lyraEncPub(hex: string) {
     const result = this.lyraEnc(hex.substring(2));
     const tag = "L";
     return tag.concat(result);
   }
 
-  static lyraEnc(hex: string) {
+  private static lyraEnc(hex: string) {
     const buff = this.fromHexString(hex);
     const crc = this.checksum(buff);
     const crcBuff = this.fromHexString(crc);
@@ -62,7 +62,7 @@ class LyraCrypto {
     return bs58.encode(Buffer.from(buff2));
   }
 
-  static lyraDec(pvtKey: string) {
+  private static lyraDec(pvtKey: string) {
     const dec = bs58.decode(pvtKey);
     // var buff = this.toUTF8Array(dec);
     const buff = dec;
@@ -87,10 +87,13 @@ class LyraCrypto {
     return bytes.toString(CryptoJs.enc.Utf8);
   }
 
-  static lyraGenWallet() {
+  static GenerateWallet() {
     const ec = new KJUR.crypto.ECDSA({ curve: "secp256r1" });
     const keypair = ec.generateKeyPairHex();
-    return keypair.ecprvhex;
+    var pvtHex = keypair.ecprvhex;
+    var prvKey = LyraCrypto.lyraEncPvt(pvtHex);
+    var actId = LyraCrypto.lyraEncPub(LyraCrypto.prvToPub(pvtHex));
+    return { privateKey: prvKey, accountId: actId };
   }
 
   static lyraSign(msg: string, prvkey: string) {
@@ -113,7 +116,18 @@ class LyraCrypto {
     return sig.verify(sigval);
   }
 
-  static prvToPub(prvkey: string) {
+  static GetAccountIdFromPrivateKey(privateKey: string) {
+    const pvkDec: string | undefined = LyraCrypto.lyraDec(privateKey);
+    if (pvkDec === undefined) {
+      fail("not lyra private key");
+      return undefined;
+    }
+    const pubkey: string = LyraCrypto.prvToPub(pvkDec);
+    const resp: string = LyraCrypto.lyraEncPub(pubkey);
+    return resp;
+  }
+
+  private static prvToPub(prvkey: string) {
     const sig = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
     sig.init({ d: prvkey, curve: "secp256r1" });
     const biPrv = new KJUR.BigInteger(prvkey, 16);
@@ -130,7 +144,7 @@ class LyraCrypto {
     return hPub;
   }
 
-  static toUTF8Array(str: string) {
+  private static toUTF8Array(str: string) {
     var utf8 = [];
     for (var i = 0; i < str.length; i++) {
       var charcode = str.charCodeAt(i);

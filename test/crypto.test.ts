@@ -1,5 +1,5 @@
 /* globals describe, expect, test */
-import LyraCrypto from "../src/crypto";
+import LyraCrypto from "../src";
 
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {

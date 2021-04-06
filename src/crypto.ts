@@ -49,9 +49,16 @@ class LyraCrypto {
   }
 
   private static lyraEncPub(hex: string) {
-    const result = this.lyraEnc(hex.substring(2));
+    const result = this.lyraEnc(hex.substring(2)); //'04', means 'not compressed'
     const tag = "L";
     return tag.concat(result);
+  }
+
+  private static lyraDecAccountId(accountId: string) {
+    const pubKey = accountId.substring(1);
+    const decStr = this.lyraDec(pubKey);
+    if (decStr === undefined) return undefined;
+    return "04" + decStr;
   }
 
   private static lyraEnc(hex: string) {
@@ -78,6 +85,17 @@ class LyraCrypto {
     }
   }
 
+  static isAccountIdValid(accountId: string) {
+    if (accountId.length < 10 || accountId.substring(0, 1) !== "L")
+      return false;
+    const decStr = this.lyraDecAccountId(accountId);
+    return decStr !== undefined;
+  }
+
+  static isPrivateKeyValid(privateKey: string) {
+    return undefined !== this.lyraDec(privateKey);
+  }
+
   static encrypt(s: string, password: string) {
     return CryptoJs.AES.encrypt(s, password).toString();
   }
@@ -96,7 +114,8 @@ class LyraCrypto {
     return { privateKey: prvKey, accountId: actId };
   }
 
-  static lyraSign(msg: string, prvkey: string) {
+  static Sign(msg: string, privateKey: string) {
+    const prvkey = this.lyraDec(privateKey);
     const sig = new KJUR.crypto.Signature({ alg: "SHA256withECDSA" });
     sig.init({ d: prvkey, curve: "secp256r1" });
     const buff = this.toHexString(this.toUTF8Array(msg));
@@ -105,11 +124,11 @@ class LyraCrypto {
     return sigValueHex;
   }
 
-  static lyraVerify(msg: string, pubkey: string, sigval: string) {
+  static Verify(msg: string, accountId: string, sigval: string) {
     const sig = new KJUR.crypto.Signature({
-      alg: "SHA256withECDSA",
-      prov: "cryptojs/jsrsa"
+      alg: "SHA256withECDSA"
     });
+    const pubkey = this.lyraDecAccountId(accountId);
     sig.init({ xy: pubkey, curve: "secp256r1" });
     const buff = this.toHexString(this.toUTF8Array(msg));
     sig.updateHex(buff);

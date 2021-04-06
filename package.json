@@ -29,7 +29,8 @@
   "scripts": {
     "build": "webpack",
     "lint": "eslint --fix --ext .ts .",
-    "test": "jest"
+    "test": "jest",
+    "debug": "node --inspect-brk ./node_modules/jest/bin/jest -i"
   },
   "jest": {
     "moduleFileExtensions": [

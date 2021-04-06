@@ -18,7 +18,7 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    library: 'lyracrypto',
+    library: 'lyraCrypto',
     path: path.resolve(__dirname, 'dist')
   }
 }

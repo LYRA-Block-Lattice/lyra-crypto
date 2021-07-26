@@ -1,5 +1,5 @@
 /* globals describe, expect, test */
-import LyraCrypto from "../src";
+import { LyraCrypto } from "../src/lyra-crypto";
 
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {
@@ -32,9 +32,8 @@ describe("Lyra Crypto Library Test", (): void => {
 
   test("wallet 2", (): void => {
     const { privateKey, accountId } = LyraCrypto.GenerateWallet();
-    const resp: string | undefined = LyraCrypto.GetAccountIdFromPrivateKey(
-      privateKey
-    );
+    const resp: string | undefined =
+      LyraCrypto.GetAccountIdFromPrivateKey(privateKey);
     if (resp === undefined) {
       fail("not lyra private key");
       return;

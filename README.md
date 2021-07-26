@@ -46,7 +46,7 @@ API returns (example):
 
 ```
 
-- Usage
+# Usage
 
 install:
 
@@ -84,6 +84,6 @@ use a private node:
 
 [More Example](https://github.com/LYRA-Block-Lattice/lyra-crypto/blob/master/test/crypto.test.ts)
 
-- Security
+# Security
 
 Private key never leaves current client process. For safety, call close() immediately after send/receive.

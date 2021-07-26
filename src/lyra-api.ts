@@ -110,6 +110,7 @@ export class LyraApi {
         destAddr,
         token
       ]);
+      return balanceResp.result;
     } catch (error) {
       console.log("ws send error", error);
       throw error;
@@ -122,7 +123,7 @@ export class LyraApi {
         await this.ws.open();
       }
       const balanceResp = await this.ws.call("Receive", [this.accountId]);
-      return balanceResp;
+      return balanceResp.result;
     } catch (error) {
       console.log("ws receive error", error);
       throw error;
@@ -135,7 +136,7 @@ export class LyraApi {
     }
 
     const balanceResp = await this.ws.call("Balance", [this.accountId]);
-    return balanceResp;
+    return balanceResp.result;
   }
 
   close() {

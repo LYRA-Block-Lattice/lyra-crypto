@@ -56,7 +56,31 @@ describe("Lyra Crypto Library Test", (): void => {
     const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     const wallet = new LyraApi("testnet", pvk);
     await wallet.init();
-    const balance = await wallet.balance();
-    expect(balance).toBeDefined();
+    const result = await wallet.balance();
+    expect(result).toBeDefined();
+  });
+
+  it("works with send", async () => {
+    const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
+    const dst =
+      "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
+    const wallet = new LyraApi("testnet", pvk);
+    await wallet.init();
+    const result = await wallet.balance();
+    expect(result).toBeDefined();
+
+    const result2 = await wallet.send(dst, 1, "LYR");
+    expect(result2).toBeDefined();
+
+    var delta = result.balance["LYR"] - result2.balance["LYR"];
+    expect(delta).toEqual(2);
+  });
+
+  it("works with receive", async () => {
+    const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
+    const wallet = new LyraApi("testnet", pvk);
+    await wallet.init();
+    const result = await wallet.balance();
+    expect(result).toBeDefined();
   });
 });

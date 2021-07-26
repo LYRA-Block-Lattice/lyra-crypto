@@ -7,8 +7,8 @@ export declare class LyraApi {
     constructor(network: string, privateKey: string, node?: string);
     init(): Promise<void>;
     private createWS;
-    send(destAddr: string, amount: number, token: string): Promise<void>;
-    receive(): Promise<import("jsonrpc-client-websocket").JsonRpcResponse>;
-    balance(): Promise<import("jsonrpc-client-websocket").JsonRpcResponse>;
+    send(destAddr: string, amount: number, token: string): Promise<any>;
+    receive(): Promise<any>;
+    balance(): Promise<any>;
     close(): void;
 }

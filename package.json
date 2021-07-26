@@ -1,7 +1,7 @@
 {
   "name": "lyra-crypto",
-  "version": "0.1.4",
-  "description": "Crypto library used by Lyra blockchain",
+  "version": "0.2.0",
+  "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",
   "license": "MIT",

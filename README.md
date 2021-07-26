@@ -47,6 +47,14 @@ API returns (example):
 
 - Usage
 
+install:
+
+```
+yarn add lyra-crypto
+```
+
+call the api:
+
 ```
   const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
   const wallet = new LyraApi("testnet", pvk);

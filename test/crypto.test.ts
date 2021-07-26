@@ -1,5 +1,6 @@
 /* globals describe, expect, test */
 import { LyraCrypto } from "../src/lyra-crypto";
+import { LyraApi } from "../src/lyra-api";
 
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {
@@ -49,5 +50,13 @@ describe("Lyra Crypto Library Test", (): void => {
     const signature = LyraCrypto.Sign(msg, pvk);
     const result = LyraCrypto.Verify(msg, pub, signature);
     expect(result).toBe(true);
+  });
+
+  it("works with get balance", async () => {
+    const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
+    const wallet = new LyraApi("testnet", pvk);
+    await wallet.init();
+    const balance = await wallet.balance();
+    expect(balance).toBeDefined();
   });
 });

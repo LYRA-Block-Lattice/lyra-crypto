@@ -1,6 +1,6 @@
 # lyra-crypto
 
-Javascript library to do crypto for Lyra blockchain.
+Javascript library to do crypto for Lyra blockchain. This client lib works with any Lyra node. [Lyra JsonRPC API Specification](https://github.com/LYRA-Block-Lattice/Lyra-Core/blob/master/docs/JsonRPC.md)
 
 - LyraCrypto class
 

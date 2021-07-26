@@ -80,3 +80,5 @@ use a private node:
   // delta === 2
 
 ```
+
+[More Example](https://github.com/LYRA-Block-Lattice/lyra-crypto/blob/master/test/crypto.test.ts)

@@ -76,7 +76,7 @@ describe("Lyra Crypto Library Test", (): void => {
   //   expect(delta).toEqual(2);
   // });
 
-  it("works with receive", async () => {
+  it("works with send & receive", async () => {
     jest.setTimeout(30000);
 
     const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";

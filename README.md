@@ -61,3 +61,22 @@ call the api:
   await wallet.init();
   const result = await wallet.balance();
 ```
+
+use a private node:
+
+[Setup Lyra Node in APP mode](https://github.com/LYRA-Block-Lattice/Lyra-Core#run-node-damon-in-app-mode)
+
+```
+  const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
+  const wallet = new LyraApi("testnet", pvk, "192.168.0.1");        // local lyra node
+  await wallet.init();
+  const result = await wallet.balance();
+
+  const dst =
+      "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
+  const result2 = await wallet.send(dst, 1, "LYR");
+
+  var delta = result.balance["LYR"] - result2.balance["LYR"];
+  // delta === 2
+
+```

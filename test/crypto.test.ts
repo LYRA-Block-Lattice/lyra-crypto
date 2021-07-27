@@ -93,7 +93,7 @@ describe("Lyra Crypto Library Test", (): void => {
     const result5 = await wallet2.balance();
     expect(result5).toBeDefined();
 
-    const result2 = await wallet.send(dst, 1, "LYR");
+    const result2 = await wallet.send(1, dst, "LYR");
     expect(result2).toBeDefined();
 
     var delta = result.balance["LYR"] - result2.balance["LYR"];

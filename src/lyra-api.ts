@@ -99,7 +99,7 @@ export class LyraApi {
     }
   }
 
-  async send(destAddr: string, amount: number, token: string) {
+  async send(amount: number, destAddr: string, token: string) {
     try {
       if (this.ws.state === WebsocketReadyStates.CLOSED) {
         await this.ws.open();

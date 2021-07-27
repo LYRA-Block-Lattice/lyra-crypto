@@ -139,6 +139,24 @@ export class LyraApi {
     return balanceResp.result;
   }
 
+  async history(startTimeUtc: Date, endTimeUtc: Date, count: number) {
+    try {
+      if (this.ws.state === WebsocketReadyStates.CLOSED) {
+        await this.ws.open();
+      }
+      const histResult = await this.ws.call("History", [
+        this.accountId,
+        startTimeUtc.getTime(),
+        endTimeUtc.getTime(),
+        count
+      ]);
+      return histResult.result;
+    } catch (error) {
+      console.log("ws history error", error);
+      throw error;
+    }
+  }
+
   close() {
     console.log("closing lyra-api");
     this.ws.close();

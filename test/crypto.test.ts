@@ -79,18 +79,19 @@ describe("Lyra Crypto Library Test", (): void => {
   it("works with send & receive", async () => {
     jest.setTimeout(30000);
 
+    var network = "devnet";
     const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
     const dst =
       "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
-    const wallet = new LyraApi("testnet", pvk);
+    const wallet = new LyraApi(network, pvk);
     await wallet.init();
     const result = await wallet.balance();
     expect(result).toBeDefined();
 
-    const wallet2 = new LyraApi("testnet", pvk2);
+    const wallet2 = new LyraApi(network, pvk2);
     await wallet2.init();
-    const result5 = await wallet2.balance();
+    const result5 = await wallet2.receive(); // remove pending unreceive
     expect(result5).toBeDefined();
 
     const result2 = await wallet.send(1, dst, "LYR");
@@ -104,5 +105,11 @@ describe("Lyra Crypto Library Test", (): void => {
     var delta2 = result6.balance["LYR"] - result5.balance["LYR"];
     console.log("delta2 is ", delta2);
     expect(delta2).toEqual(1);
+
+    var dtStart = new Date(Date.now());
+    dtStart.setDate(dtStart.getDate() - 1);
+    var hist = await wallet.history(dtStart, new Date(Date.now()), 10);
+    expect(hist).toBeDefined();
+    console.log("hist is ", hist);
   });
 });

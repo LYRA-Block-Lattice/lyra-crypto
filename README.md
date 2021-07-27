@@ -27,13 +27,16 @@ class LyraAPI {
     constructor(network: string, privateKey: string, node?: string);
     async init();
 
-    async balance() : {};
-    async send(destAddr: string, amount: number, token: string) : {};
-    async receive() : {};
+    async balance() : {};       // return balance
+    async send(amount: number, destAddr: string, token: string) : {};   // return balance
+    async receive() : {};       // return balance
+    async history() : {};       // return tx array
     close();
 }
 
 API returns (example):
+
+* balance
 
 {
     "balance": {
@@ -43,6 +46,52 @@ API returns (example):
     },
     "unreceived": true
 }
+
+* history
+
+[
+      {
+        Height: 206,
+        IsReceive: false,
+        TimeStamp: 1627411856197,
+        SendAccountId: 'LUTG2E1mdpGk5Qtq9BUgwZDWhUeZc14Xfw2pAvAdKoacvgRBU3atwtrQeoY3evm5C7TXRz3Q5nwPEUHj9p7CBDE6kQTQMy',
+        SendHash: '3v8y5F7bKkE4JkFJ84pMjDUwTaEAWyucBiCG4NaQhA4c',
+        RecvAccountId: 'LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn',
+        RecvHash: '6pkhSmjekm59LEfn2R4DEK8xz4jf7mbWN3ENbh5mvQ1z',
+        Balances: {
+          LYR: '4717212.04747006',
+          'unittest/trans': '49999983764.82218702'
+        }
+      },
+      {
+        Height: 207,
+        IsReceive: false,
+        TimeStamp: 1627412050805,
+        SendAccountId: 'LUTG2E1mdpGk5Qtq9BUgwZDWhUeZc14Xfw2pAvAdKoacvgRBU3atwtrQeoY3evm5C7TXRz3Q5nwPEUHj9p7CBDE6kQTQMy',
+        SendHash: '74mTJ2JuuamukyGcgDiD4otaBwKbw8aLiKhPoTznVGLk',
+        RecvAccountId: 'LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn',
+        RecvHash: 'GyKbpHX4VGtw4Sq2GGq88DvWZnqyY4sBwRrNB8qSp8sc',
+        Changes: { LYR: '-2' },
+        Balances: {
+          LYR: '4717210.04747006',
+          'unittest/trans': '49999983764.82218702'
+        }
+      },
+      {
+        Height: 208,
+        IsReceive: false,
+        TimeStamp: 1627413886778,
+        SendAccountId: 'LUTG2E1mdpGk5Qtq9BUgwZDWhUeZc14Xfw2pAvAdKoacvgRBU3atwtrQeoY3evm5C7TXRz3Q5nwPEUHj9p7CBDE6kQTQMy',
+        SendHash: 'B3FVLgCPLroa6WhsHDqFxrZLpPR16KaG6c6qK3fRhT9S',
+        RecvAccountId: 'LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn',
+        RecvHash: '7dFFo3rxZcfdLZKgRTf4M9pgXswhJTXbYCfq581kusBh',
+        Changes: { LYR: '-2' },
+        Balances: {
+          LYR: '4717208.04747006',
+          'unittest/trans': '49999983764.82218702'
+        }
+      }
+    ]
 
 ```
 

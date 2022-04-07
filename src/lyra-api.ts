@@ -1,4 +1,3 @@
-import { create } from "istanbul-reports";
 import {
   JsonRpcWebsocket,
   WebsocketReadyStates

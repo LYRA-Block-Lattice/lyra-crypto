@@ -4,6 +4,8 @@ import { LyraApi } from "../src/lyra-api";
 
 require("dotenv").config();
 
+jest.setTimeout(60000);
+
 const network = process.env.REACT_APP_NETWORK_ID!;
 
 describe("Lyra Crypto Library Test", (): void => {
@@ -76,8 +78,8 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(result).toBeDefined();
 
     const result2 = await wallet.send(1, dst, "LYR");
-    expect(result2).toBeTruthy();
-
+    expect(result2.resultCode).toBe(0);
+    expect(result2.resultMessage).toBe("Success");
     //var delta = result!.balance["LYR"] - result2.balance["LYR"];
     //expect(delta).toEqual(2);
   });

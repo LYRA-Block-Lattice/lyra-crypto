@@ -135,7 +135,7 @@ export class LyraCrypto {
     //const unicode = this.stringToUnicode(msg);
     const unibin = this.stringToUnicodeByteArray(msg);
     const unihex = this.toHexString(unibin);
-    console.log("unihex: " + unihex);
+    //console.log("unihex: " + unihex);
     const hashHex = this.sha256(unihex);
     const buff = this.fromHexString(hashHex);
     return bs58.encode(buff);

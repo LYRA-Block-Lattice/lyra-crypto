@@ -75,8 +75,8 @@ export class LyraApi {
       console.log("sendBlock", finalJson);
 
       var sendRet = await nodeApi.sendTransfer(finalJson);
-      console.log("sendRet", sendRet);
-      return false;
+      //console.log("sendRet", sendRet);
+      return sendRet.data;
     } catch (error) {
       console.log("send error", error);
       throw error;

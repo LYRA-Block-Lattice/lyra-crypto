@@ -1,9 +1,8 @@
 // change require to import
 var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
-import crypto from "crypto";
-import * as asn1lib from "asn1js";
 import { convertDerToP1393, decodeASN1Sequence } from "./asn1";
+import * as asn1lib from "asn1js";
 
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
@@ -224,9 +223,12 @@ export class LyraCrypto {
     // convert to P1393
     const sigbuff = this.fromHexString(sig2);
     //const sigbuff2 = this.convertDerToP1393(sigbuff);
-    // const sigbuff3 = this.convertP1393ToDer(sigbuff2);
-    // console.log("sigbuff3: ", sigbuff3);
-    // console.log("sigbuff: ", sigbuff);
+
+    // test
+    const sigbuff3 = this.convertP1393ToDer(sigbuff);
+    const sigbuff3x = this.fromHexString(sigValueHex);
+    console.log("sigbuff3: ", sigbuff3);
+    console.log("sigbuff3x: ", sigbuff3x);
 
     return bs58.encode(sigbuff);
   }

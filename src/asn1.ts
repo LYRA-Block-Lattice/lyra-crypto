@@ -61,19 +61,6 @@ function getBigIntAbsoluteValue(x: bigint): bigint {
   }
 }
 
-export function convertDerToP1393(der: string): string {
-  const integers = decodeASN1Sequence(der);
-  const r = integers[0];
-  const s = integers[1];
-
-  const rb = bigintConversion.bigintToBuf(r);
-  const sb = bigintConversion.bigintToBuf(s);
-
-  const buff = concatArrayBuffers(rb, sb);
-
-  return Buffer.from(buff).toString("hex");
-}
-
 function concatArrayBuffers(a: ArrayBuffer, b: ArrayBuffer): ArrayBuffer {
   // Create a new ArrayBuffer with a size equal to the combined length of a and b
   const result = new ArrayBuffer(a.byteLength + b.byteLength);
@@ -87,3 +74,29 @@ function concatArrayBuffers(a: ArrayBuffer, b: ArrayBuffer): ArrayBuffer {
 
   return result;
 }
+
+export function convertDerToP1393(der: string): string {
+  const integers = decodeASN1Sequence(der);
+  const r = integers[0];
+  const s = integers[1];
+
+  const rb = bigintConversion.bigintToBuf(r);
+  const sb = bigintConversion.bigintToBuf(s);
+
+  const buff = concatArrayBuffers(rb, sb);
+
+  return Buffer.from(buff).toString("hex");
+}
+
+// export function convertP1393ToDer(p1393: string): string {
+//   const buffer = new Uint8Array(Buffer.from(p1393, "hex"));
+//   const half = Math.floor(buffer.length / 2);
+//   const rb = buffer.slice(0, half);
+//   const sb = buffer.slice(half);
+
+//   const r = bigintConversion.bufToBigint(rb);
+//   const s = bigintConversion.bufToBigint(sb);
+
+//   const der = asn1.encode(asn1.Sequence, [r, s]);
+//   return Buffer.from(der).toString("hex");
+// }

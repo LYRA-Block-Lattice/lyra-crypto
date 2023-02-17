@@ -48,15 +48,15 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(resp).toBe(accountId);
   });
 
-  // test("Sign & Verify", (): void => {
-  //   const pvk = "2gbESTeBHsgt8um1aNN2dC9jajEDk3CoEupwmN6TRJQckyRbHa";
-  //   const pub =
-  //     "LUTkgGP9tb4iAFAFXv7i83N4GreEUakWbaDrUbUFnKHpPp46n9KF1QzCtvUwZRBCQz6yqerkWvvGXtCTkz4knzeKRmqid";
-  //   const msg = "aaa";
-  //   const signature = LyraCrypto.Sign(msg, pvk);
-  //   const result = LyraCrypto.Verify(msg, pub, signature);
-  //   expect(result).toBe(true);
-  // });
+  test("Sign & Verify", (): void => {
+    const pvk = "2gbESTeBHsgt8um1aNN2dC9jajEDk3CoEupwmN6TRJQckyRbHa";
+    const pub =
+      "LUTkgGP9tb4iAFAFXv7i83N4GreEUakWbaDrUbUFnKHpPp46n9KF1QzCtvUwZRBCQz6yqerkWvvGXtCTkz4knzeKRmqid";
+    const msg = "aaa";
+    const signature = LyraCrypto.Sign(msg, pvk);
+    const result = LyraCrypto.Verify(msg, pub, signature);
+    expect(result).toBe(true);
+  });
 
   it("works with get balance", async () => {
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC"; // test 3

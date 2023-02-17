@@ -60,7 +60,17 @@ export class LyraApi {
   async balance() {
     try {
       var ret = await nodeApi.getBalance(this.accountId);
-      return ret.data;
+
+      let dictionary = Object.assign(
+        {},
+        ...ret.data.map((x: any) => ({ [x.Ticker]: x.Balance }))
+      );
+      //console.log("dictionary", dictionary);
+
+      return {
+        data: ret.data,
+        balance: dictionary
+      };
     } catch (error) {
       console.log("node balance error", error);
     }

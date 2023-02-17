@@ -2,6 +2,10 @@ import { LyraApi } from "../lyra-api";
 import { LyraCrypto } from "../lyra-crypto";
 import { AccountTypes, BlockTypes } from "./meta";
 const stringify = require("json-stable-stringify");
+
+export class LyraGlobal {
+  static readonly DatabaseVersion = 11;
+}
 export class Block {
   Height: number;
   TimeStamp: string;
@@ -15,7 +19,7 @@ export class Block {
     const decodedBlockData = JSON.parse(blockData);
     this.Height = decodedBlockData.Height + 1;
     this.TimeStamp = new Date().toISOString();
-    this.Version = decodedBlockData.Version;
+    this.Version = LyraGlobal.DatabaseVersion;
     this.BlockType = this.GetBlockType();
     this.PreviousHash = decodedBlockData.Hash;
 

@@ -170,6 +170,24 @@ export class LyraCrypto {
     return buff;
   }
 
+  static convertP1393ToDer(signature: Uint8Array): Uint8Array {
+    const r = signature.slice(0, signature.length / 2);
+    const s = signature.slice(signature.length / 2);
+
+    var sequence2 = new asn1lib.Sequence({
+      value: [
+        new asn1lib.Integer({ isHexOnly: true, valueHex: r }),
+        new asn1lib.Integer({
+          isHexOnly: true,
+          valueHex: s
+        })
+      ]
+    });
+
+    const buff = sequence2.toBER();
+    return new Uint8Array(buff);
+  }
+
   static isAccountIdValid(accountId: string) {
     if (accountId.length < 10 || accountId.substring(0, 1) !== "L")
       return false;
@@ -198,9 +216,15 @@ export class LyraCrypto {
     sig.updateHex(buff);
     const sigValueHex = sig.sign();
 
+    // test convert to P1393 and back
+
     // convert to P1393
     const sigbuff = this.fromHexString(sigValueHex);
     const sigbuff2 = this.convertDerToP1393(sigbuff);
+    // const sigbuff3 = this.convertP1393ToDer(sigbuff2);
+    // console.log("sigbuff3: ", sigbuff3);
+    // console.log("sigbuff: ", sigbuff);
+
     return bs58.encode(sigbuff2);
   }
 
@@ -212,6 +236,10 @@ export class LyraCrypto {
   }
 
   static Verify(msg: string, accountId: string, sigval: string) {
+    const sigbuff = bs58.decode(sigval);
+    const sigder = this.convertP1393ToDer(sigbuff);
+    const signstr = this.toHexString(sigder);
+
     const sig = new KJUR.crypto.Signature({
       alg: "SHA256withECDSA"
     });
@@ -219,7 +247,7 @@ export class LyraCrypto {
     sig.init({ xy: pubkey, curve: "secp256r1" });
     const buff = this.toHexString(this.toUTF8Array(msg));
     sig.updateHex(buff);
-    return sig.verify(sigval);
+    return sig.verify(signstr);
   }
 
   static GetAccountIdFromPrivateKey(privateKey: string) {

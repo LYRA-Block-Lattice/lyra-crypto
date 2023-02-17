@@ -1,25 +1,21 @@
 export class Block {
   Height: number;
-  TimeStamp: Date;
+  TimeStamp: string;
   Version: number;
   BlockType: number;
   PreviousHash: string;
   ServiceHash: string;
   Tags: any;
-  Hash: string;
-  Signature: string;
 
   constructor(blockData: string) {
-    const decodedBlockData = JSON.parse(JSON.parse(blockData));
-    this.Height = decodedBlockData.Height;
-    this.TimeStamp = new Date(decodedBlockData.TimeStamp);
+    const decodedBlockData = JSON.parse(blockData);
+    this.Height = decodedBlockData.Height + 1;
+    this.TimeStamp = new Date().toISOString();
     this.Version = decodedBlockData.Version;
     this.BlockType = decodedBlockData.BlockType;
-    this.PreviousHash = decodedBlockData.PreviousHash;
-    this.ServiceHash = decodedBlockData.ServiceHash;
-    this.Tags = decodedBlockData.Tags;
-    this.Hash = decodedBlockData.Hash;
-    this.Signature = decodedBlockData.Signature;
+    this.PreviousHash = decodedBlockData.Hash;
+
+    this.Tags = null;
   }
 }
 
@@ -36,7 +32,7 @@ export class TransactionBlock extends Block {
 
   constructor(blockData: string) {
     super(blockData);
-    const decodedBlockData = JSON.parse(JSON.parse(blockData));
+    const decodedBlockData = JSON.parse(blockData);
     this.AccountID = decodedBlockData.AccountID;
     this.Balances = decodedBlockData.Balances;
     this.Fee = decodedBlockData.Fee;
@@ -52,7 +48,7 @@ export class SendTransferBlock extends TransactionBlock {
 
   constructor(blockData: string) {
     super(blockData);
-    const decodedBlockData = JSON.parse(JSON.parse(blockData));
+    const decodedBlockData = JSON.parse(blockData);
     this.DestinationAccountId = decodedBlockData.DestinationAccountId;
   }
 }
@@ -62,7 +58,7 @@ export class ReceiveTransferBlock extends TransactionBlock {
 
   constructor(blockData: string) {
     super(blockData);
-    const decodedBlockData = JSON.parse(JSON.parse(blockData));
+    const decodedBlockData = JSON.parse(blockData);
     this.SourceHash = decodedBlockData.SourceHash;
   }
 }

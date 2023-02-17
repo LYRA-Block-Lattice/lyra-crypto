@@ -1,4 +1,5 @@
 import moment from "moment";
+import { SendTransferBlock } from "./blocks/block";
 const stringify = require("json-stable-stringify");
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -37,26 +38,30 @@ export class LyraApi {
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);
       var lsb = await nodeApi.lastServiceHash();
-      var block = JSON.parse(ret.data.blockData);
+      //var block = JSON.parse(ret.data.blockData);
       //console.log("block", block);
-      var sendBlock = {
-        AccountID: block.AccountID,
-        Balances: block.Balances,
-        Fee: block.Fee,
-        FeeCode: block.FeeCode,
-        FeeType: block.FeeType,
-        NonFungibleToken: null,
-        VoteFor: block.VoteFor,
-        Height: block.Height + 1,
-        TimeStamp: new Date().toISOString(),
-        Version: 11,
-        BlockType: BlockTypes.SendTransfer,
-        PreviousHash: block.Hash,
-        ServiceHash: lsb.data,
-        Tags: null,
-        DestinationAccountId: destAddr
-      };
+      // var sendBlock = {
+      //   AccountID: block.AccountID,
+      //   Balances: block.Balances,
+      //   Fee: block.Fee,
+      //   FeeCode: block.FeeCode,
+      //   FeeType: block.FeeType,
+      //   NonFungibleToken: null,
+      //   VoteFor: block.VoteFor,
+      //   Height: block.Height + 1,
+      //   TimeStamp: new Date().toISOString(),
+      //   Version: 11,
+      //   BlockType: BlockTypes.SendTransfer,
+      //   PreviousHash: block.Hash,
+      //   ServiceHash: lsb.data,
+      //   Tags: null,
+      //   DestinationAccountId: destAddr
+      // };
+      var sendBlock = new SendTransferBlock(ret.data.blockData);
       sendBlock.Balances[token] -= amount * 600000000;
+      sendBlock.ServiceHash = lsb.data;
+      sendBlock.DestinationAccountId = destAddr;
+
       var json = stringify(sendBlock);
       // hack: to compatible with Newtonsoft.Json
       json = json.replace(',"Fee":1,', ',"Fee":1.0,');

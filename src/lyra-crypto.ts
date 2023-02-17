@@ -227,8 +227,8 @@ export class LyraCrypto {
     // test
     const sigbuff3 = this.convertP1393ToDer(sigbuff);
     const sigbuff3x = this.fromHexString(sigValueHex);
-    console.log("sigbuff3: ", sigbuff3);
-    console.log("sigbuff3x: ", sigbuff3x);
+    //console.log("sigbuff3: ", sigbuff3);
+    //console.log("sigbuff3x: ", sigbuff3x);
 
     return bs58.encode(sigbuff);
   }

@@ -59,10 +59,8 @@ export class LyraApi {
 
   async balance() {
     try {
-      var ret = await nodeApi.GetLastBlock(this.accountId);
-      var block = JSON.parse(ret.data.blockData);
-      console.log("node balance", block);
-      return block;
+      var ret = await nodeApi.getBalance(this.accountId);
+      return ret.data;
     } catch (error) {
       console.log("node balance error", error);
     }

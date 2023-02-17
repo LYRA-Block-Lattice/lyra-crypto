@@ -63,6 +63,9 @@ describe("Lyra Crypto Library Test", (): void => {
     await wallet.init();
     const result = await wallet.balance();
     expect(result).toBeDefined();
+    expect(result.find((a: any) => a.Ticker == "LYR").Balance).toBeGreaterThan(
+      10000
+    );
   });
 
   // it("works with send", async () => {

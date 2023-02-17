@@ -1,13 +1,8 @@
 import moment from "moment";
 import { SendTransferBlock } from "./blocks/block";
-const stringify = require("json-stable-stringify");
+
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
-
-export enum BlockTypes {
-  SendTransfer = 31,
-  ReceiveTransfer = 32
-}
 
 export class LyraApi {
   private network: string;
@@ -34,50 +29,21 @@ export class LyraApi {
 
   init() {}
 
+  sign(data: string) {
+    return LyraCrypto.Sign(data, this.prvKey);
+  }
+
   async send(amount: number, destAddr: string, token: string) {
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);
       var lsb = await nodeApi.lastServiceHash();
-      //var block = JSON.parse(ret.data.blockData);
-      //console.log("block", block);
-      // var sendBlock = {
-      //   AccountID: block.AccountID,
-      //   Balances: block.Balances,
-      //   Fee: block.Fee,
-      //   FeeCode: block.FeeCode,
-      //   FeeType: block.FeeType,
-      //   NonFungibleToken: null,
-      //   VoteFor: block.VoteFor,
-      //   Height: block.Height + 1,
-      //   TimeStamp: new Date().toISOString(),
-      //   Version: 11,
-      //   BlockType: BlockTypes.SendTransfer,
-      //   PreviousHash: block.Hash,
-      //   ServiceHash: lsb.data,
-      //   Tags: null,
-      //   DestinationAccountId: destAddr
-      // };
+
       var sendBlock = new SendTransferBlock(ret.data.blockData);
       sendBlock.Balances[token] -= amount * 600000000;
       sendBlock.ServiceHash = lsb.data;
       sendBlock.DestinationAccountId = destAddr;
 
-      var json = stringify(sendBlock);
-      // hack: to compatible with Newtonsoft.Json
-      json = json.replace(',"Fee":1,', ',"Fee":1.0,');
-      //console.log("original block:", sendBlock);
-      console.log("json to hash:", json);
-
-      var hash = LyraCrypto.Hash(json);
-      const signature = LyraCrypto.Sign(hash, this.prvKey);
-      console.log(`Hash is: ${hash} and signature is ${signature}`);
-      var finalBlock = {
-        ...sendBlock,
-        Signature: signature,
-        Hash: hash
-      };
-
-      var finalJson = JSON.stringify(finalBlock);
+      const finalJson = sendBlock.toJson(this);
       console.log("sendBlock", finalJson);
 
       var sendRet = await nodeApi.sendTransfer(finalJson);

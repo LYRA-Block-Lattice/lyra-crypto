@@ -13,7 +13,7 @@ export declare class LyraCrypto {
     static isAccountIdValid(accountId: string): boolean;
     static isPrivateKeyValid(privateKey: string): boolean;
     static GenerateWallet(): {
-        privateKey: any;
+        privateKey: string;
         accountId: string;
     };
     static Sign(msg: string, privateKey: string): any;

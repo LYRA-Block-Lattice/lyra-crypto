@@ -84,14 +84,14 @@ export class LyraApi {
         console.log("Signature", signt);
 
         return ["der", signt];
-      } catch (err) {
+      } catch (err: any) {
         console.log("Error sign message", err);
         return ["err", err.toString()];
       }
     });
 
     try {
-      const response = await this.ws.call("Status", ["2.2.0.0", this.network]);
+      const response = await this.ws.call("Status", ["3.6.6.0", this.network]);
       await this.ws.call("Monitor", [this.accountId]);
     } catch (error) {
       console.log("ws init error", error);

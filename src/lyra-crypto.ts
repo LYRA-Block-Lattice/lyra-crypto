@@ -1,5 +1,6 @@
-const KJUR = require("jsrsasign");
-const bs58 = require("bs58");
+// change require to import
+var KJUR = require("jsrsasign");
+import * as bs58 from "bs58";
 
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
@@ -64,7 +65,8 @@ export class LyraCrypto {
     const crc = this.checksum(buff);
     const crcBuff = this.fromHexString(crc);
     const buff2 = this.concatTypedArrays(buff, crcBuff);
-    return bs58.encode(Buffer.from(buff2));
+    // return base58 encode of buff2
+    return bs58.encode(buff2);
   }
 
   private static lyraDec(pvtKey: string) {

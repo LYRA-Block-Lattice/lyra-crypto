@@ -1,4 +1,5 @@
 import { LyraCrypto } from "./lyra-crypto";
+import * as nodeApi from "./node-api";
 
 export class LyraApi {
   private network: string;
@@ -57,11 +58,14 @@ export class LyraApi {
   }
 
   async balance() {
-    // if (this.ws.state === WebsocketReadyStates.CLOSED) {
-    //   await this.ws.open();
-    // }
-    // const balanceResp = await this.ws.call("Balance", [this.accountId]);
-    // return balanceResp.result;
+    try {
+      var ret = await nodeApi.GetLastBlock(this.accountId);
+      var block = JSON.parse(ret.data.blockData);
+      console.log("node balance", block);
+      return block;
+    } catch (error) {
+      console.log("node balance error", error);
+    }
   }
 
   async history(startTimeUtc: Date, endTimeUtc: Date, count: number) {

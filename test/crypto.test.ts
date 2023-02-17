@@ -2,6 +2,10 @@
 import { LyraCrypto } from "../src/lyra-crypto";
 import { LyraApi } from "../src/lyra-api";
 
+require("dotenv").config();
+
+const network = process.env.REACT_APP_NETWORK_ID!;
+
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {
     const pvk = "2gbESTeBHsgt8um1aNN2dC9jajEDk3CoEupwmN6TRJQckyRbHa";
@@ -52,13 +56,14 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(result).toBe(true);
   });
 
-  // it("works with get balance", async () => {
-  //   const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
-  //   const wallet = new LyraApi("testnet", pvk);
-  //   await wallet.init();
-  //   const result = await wallet.balance();
-  //   expect(result).toBeDefined();
-  // });
+  it("works with get balance", async () => {
+    const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
+    // public address: LUTnKnTaeZ95MaCCeA4Y7RZeLo5PrmAipuvaaHMvrpk3awbc7VBSWNRRuhQuA5qy5SGNh7imC71jaMCdttMN1a6DrSPTP6
+    const wallet = new LyraApi(network, pvk);
+    await wallet.init();
+    const result = await wallet.balance();
+    expect(result).toBeDefined();
+  });
 
   // it("works with send", async () => {
   //   const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
@@ -79,7 +84,6 @@ describe("Lyra Crypto Library Test", (): void => {
   it("works with send & receive", async () => {
     jest.setTimeout(30000);
 
-    var network = "devnet";
     const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
     const dst =

@@ -593,6 +593,11 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@juanelas/base64@^1.0.1":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@juanelas/base64/-/base64-1.0.5.tgz#abbda3f529947b4d9784619c4fa039a3f9b58399"
+  integrity sha512-gTIElNo4ohMcYUZzol/Hb6DYJzphxl0b1B4egJJ+JiqxqcOcWx4XLMAB+lhWuMsMX3uR1oc5hwPusU3lgc1FkQ==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -1211,6 +1216,13 @@ base-x@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/base-x/-/base-x-4.0.0.tgz"
   integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
+
+bigint-conversion@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/bigint-conversion/-/bigint-conversion-2.3.0.tgz#dbe983a95dce817d9fd1e9944c3bfaeede9ec419"
+  integrity sha512-U4Yzg8ygZ3m78n9weKP/6NMxN/98Pdsw6YdnDYgQO8fffL7ila31fCZIy5lCMswr4kEcyl8bGHltcHT0QdG/MQ==
+  dependencies:
+    "@juanelas/base64" "^1.0.1"
 
 brace-expansion@^1.1.7:
   version "1.1.11"

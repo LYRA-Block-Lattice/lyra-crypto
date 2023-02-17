@@ -3,6 +3,7 @@ var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
 import crypto from "crypto";
 import * as asn1lib from "asn1js";
+import { convertDerToP1393, decodeASN1Sequence } from "./asn1";
 
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
@@ -149,26 +150,26 @@ export class LyraCrypto {
     // return bs58.encode(buff);
   }
 
-  static convertDerToP1393(bcSignature: Uint8Array): Uint8Array {
-    const asn1 = asn1lib.fromBER(bcSignature.buffer);
-    console.log("asn1: ", asn1);
+  // static convertDerToP1393(bcSignature: Uint8Array): Uint8Array {
+  //   const asn1 = asn1lib.fromBER(bcSignature.buffer);
+  //   console.log("asn1: ", asn1);
 
-    const bcDerSequence = asn1.result as asn1lib.Sequence;
-    console.log("bcDerSequence: ", bcDerSequence);
+  //   const bcDerSequence = asn1.result as asn1lib.Sequence;
+  //   console.log("bcDerSequence: ", bcDerSequence);
 
-    const bcR = bcDerSequence.valueBlock.value[0] as asn1lib.Integer;
-    console.log("bcR: ", bcR);
+  //   const bcR = bcDerSequence.valueBlock.value[0] as asn1lib.Integer;
+  //   console.log("bcR: ", bcR);
 
-    const bcS = bcDerSequence.valueBlock.value[1] as asn1lib.Integer;
-    console.log("bcS: ", bcS);
+  //   const bcS = bcDerSequence.valueBlock.value[1] as asn1lib.Integer;
+  //   console.log("bcS: ", bcS);
 
-    const buff = new Uint8Array(
-      bcR.valueBlock.valueHexView.length + bcS.valueBlock.valueHexView.length
-    );
-    buff.set(bcR.valueBlock.valueHexView, 0);
-    buff.set(bcS.valueBlock.valueHexView, bcR.valueBlock.valueHexView.length);
-    return buff;
-  }
+  //   const buff = new Uint8Array(
+  //     bcR.valueBlock.valueHexView.length + bcS.valueBlock.valueHexView.length
+  //   );
+  //   buff.set(bcR.valueBlock.valueHexView, 0);
+  //   buff.set(bcS.valueBlock.valueHexView, bcR.valueBlock.valueHexView.length);
+  //   return buff;
+  // }
 
   static convertP1393ToDer(signature: Uint8Array): Uint8Array {
     const r = signature.slice(0, signature.length / 2);
@@ -215,25 +216,27 @@ export class LyraCrypto {
     const buff = this.toHexString(this.toUTF8Array(msg));
     sig.updateHex(buff);
     const sigValueHex = sig.sign();
+    //return sigValueHex;
 
     // test convert to P1393 and back
+    const sig2 = convertDerToP1393(sigValueHex);
 
     // convert to P1393
-    const sigbuff = this.fromHexString(sigValueHex);
-    const sigbuff2 = this.convertDerToP1393(sigbuff);
+    const sigbuff = this.fromHexString(sig2);
+    //const sigbuff2 = this.convertDerToP1393(sigbuff);
     // const sigbuff3 = this.convertP1393ToDer(sigbuff2);
     // console.log("sigbuff3: ", sigbuff3);
     // console.log("sigbuff: ", sigbuff);
 
-    return bs58.encode(sigbuff2);
+    return bs58.encode(sigbuff);
   }
 
-  static Sign2(msg: string, privateKey: string) {
-    const signstr = this.Sign(msg, privateKey);
-    const signbuff = this.fromHexString(signstr);
-    const signbuff2 = this.convertDerToP1393(signbuff);
-    return bs58.encode(signbuff2);
-  }
+  // static Sign2(msg: string, privateKey: string) {
+  //   const signstr = this.Sign(msg, privateKey);
+  //   const signbuff = this.fromHexString(signstr);
+  //   const signbuff2 = convertDerToP1393(signbuff);
+  //   return bs58.encode(signbuff2);
+  // }
 
   static Verify(msg: string, accountId: string, sigval: string) {
     const sigbuff = bs58.decode(sigval);

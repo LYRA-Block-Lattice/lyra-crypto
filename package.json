@@ -45,15 +45,21 @@
       "js"
     ],
     "transform": {
-      "^.+\\.ts$": ["ts-jest", {
-        "tsconfig": "tsconfig.json"
-      }]
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.json"
+        }
+      ]
     },
-    "globals": {
-      
-    },
+    "globals": {},
     "testMatch": [
       "**/test/**/*.test.ts"
     ]
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "json-stable-stringify": "^1.0.2",
+    "moment": "^2.29.4"
   }
 }

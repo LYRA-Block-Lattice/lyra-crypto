@@ -57,7 +57,7 @@ describe("Lyra Crypto Library Test", (): void => {
   });
 
   it("works with get balance", async () => {
-    const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
+    const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC"; // test 3
     // public address: LUTnKnTaeZ95MaCCeA4Y7RZeLo5PrmAipuvaaHMvrpk3awbc7VBSWNRRuhQuA5qy5SGNh7imC71jaMCdttMN1a6DrSPTP6
     const wallet = new LyraApi(network, pvk);
     await wallet.init();
@@ -66,21 +66,21 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(result?.balance["LYR"]).toBeGreaterThan(10000);
   });
 
-  // it("works with send", async () => {
-  //   const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
-  //   const dst =
-  //     "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
-  //   const wallet = new LyraApi("testnet", pvk);
-  //   await wallet.init();
-  //   const result = await wallet.balance();
-  //   expect(result).toBeDefined();
+  it("works with send", async () => {
+    const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
+    const dst =
+      "LUT5jYomQHCJQhG3Co7GadEtohpwwYtyYz1vABHGeDkLDpSJGXFfpYgD9XckRXQg2Hv2Yrb2Ade3jbecZpLf4hbVho6b5n"; // test 4
+    const wallet = new LyraApi("testnet", pvk);
+    await wallet.init();
+    const result = await wallet.balance();
+    expect(result).toBeDefined();
 
-  //   const result2 = await wallet.send(dst, 1, "LYR");
-  //   expect(result2).toBeDefined();
+    const result2 = await wallet.send(1, dst, "LYR");
+    expect(result2).toBeTruthy();
 
-  //   var delta = result.balance["LYR"] - result2.balance["LYR"];
-  //   expect(delta).toEqual(2);
-  // });
+    //var delta = result!.balance["LYR"] - result2.balance["LYR"];
+    //expect(delta).toEqual(2);
+  });
 
   it("works with send & receive", async () => {
     jest.setTimeout(30000);

@@ -1,6 +1,7 @@
 // change require to import
 var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
+import crypto from "crypto";
 
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
@@ -28,12 +29,6 @@ export class LyraCrypto {
   private static sliceTypedArrays(a: Uint8Array, offset: number, len: number) {
     // a, TypedArray, from offset with len
     return a.slice(offset, offset + len);
-  }
-
-  private static sha256(hexString: string) {
-    // SJCL(Stanford JavaScript Crypto Library) provider sample
-    const md = new KJUR.crypto.MessageDigest({ alg: "sha256", prov: "sjcl" }); // sjcl supports sha256 only
-    return md.digestHex(hexString);
   }
 
   private static checksum(data: Uint8Array) {
@@ -85,6 +80,92 @@ export class LyraCrypto {
     }
   }
 
+  // input: hex string, output: hex string
+  static sha256(hexString: string) {
+    // SJCL(Stanford JavaScript Crypto Library) provider sample
+    const md = new KJUR.crypto.MessageDigest({ alg: "sha256", prov: "sjcl" }); // sjcl supports sha256 only
+    return md.digestHex(hexString);
+  }
+
+  // code by chatgpt
+  static async sha256alt(input: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return bs58.encode(new Uint8Array(hash));
+    // return Array.from(new Uint8Array(hash))
+    //   .map((b) => b.toString(16).padStart(2, "0"))
+    //   .join("");
+  }
+
+  static stringToUnicodeByteArray(str: string): Uint8Array {
+    const encoder = new TextEncoder();
+    const utf8Array = encoder.encode(str);
+    const byteArray = new Uint8Array(utf8Array.length * 2);
+    for (let i = 0; i < utf8Array.length; i++) {
+      byteArray[i * 2] = utf8Array[i];
+      byteArray[i * 2 + 1] = 0;
+    }
+    return byteArray;
+  }
+
+  static stringToUnicode(str: string): string {
+    let unicode = "";
+    for (let i = 0; i < str.length; i++) {
+      const charCode = str.charCodeAt(i);
+      const hexCode = charCode.toString(16).toUpperCase();
+      const paddedHexCode = hexCode.padStart(4, "0");
+      unicode += `\\u${paddedHexCode}`;
+    }
+    return unicode;
+  }
+
+  static stringToHex(str: string): string {
+    let hex = "";
+    for (let i = 0; i < str.length; i++) {
+      const charCode = str.charCodeAt(i);
+      const hexCode = charCode.toString(16).toUpperCase();
+      hex += hexCode;
+      hex += "00";
+    }
+    return hex;
+  }
+
+  static Hash(msg: string) {
+    //const unicode = this.stringToUnicode(msg);
+    const unibin = this.stringToUnicodeByteArray(msg);
+    const unihex = this.toHexString(unibin);
+    console.log("unihex: " + unihex);
+    const hashHex = this.sha256(unihex);
+    const buff = this.fromHexString(hashHex);
+    return bs58.encode(buff);
+    // const hashBuffer = await crypto.subtle.digest("SHA-256", utf8);
+    // const hashArray = Array.from(new Uint8Array(hashBuffer));
+    // const hashHex = hashArray
+    //   .map((bytes) => bytes.toString(16).padStart(2, "0"))
+    //   .join("");
+    // const buff = this.fromHexString(hashHex);
+    // return bs58.encode(buff);
+  }
+
+  static convertDerToP1393(bcSignature: Uint8Array): Uint8Array {
+    const asn1 = KJUR.asn1.ASN1Util.getHexOfTLV_AtObj(bcSignature, 0);
+    const seq = new KJUR.asn1(asn1);
+    const r = seq.sub[0].getHexStringValue();
+    const s = seq.sub[1].getHexStringValue();
+    const buff = new Uint8Array(r.length / 2 + s.length / 2);
+
+    for (let i = 0; i < r.length; i += 2) {
+      buff[i / 2] = parseInt(r.substr(i, 2), 16);
+    }
+
+    for (let i = 0; i < s.length; i += 2) {
+      buff[r.length / 2 + i / 2] = parseInt(s.substr(i, 2), 16);
+    }
+
+    return buff;
+  }
+
   static isAccountIdValid(accountId: string) {
     if (accountId.length < 10 || accountId.substring(0, 1) !== "L")
       return false;
@@ -113,6 +194,13 @@ export class LyraCrypto {
     sig.updateHex(buff);
     const sigValueHex = sig.sign();
     return sigValueHex;
+  }
+
+  static Sign2(msg: string, privateKey: string) {
+    const signstr = this.Sign(msg, privateKey);
+    const signbuff = this.fromHexString(signstr);
+    const signbuff2 = this.convertDerToP1393(signbuff);
+    return bs58.encode(signbuff2);
   }
 
   static Verify(msg: string, accountId: string, sigval: string) {

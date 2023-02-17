@@ -41,6 +41,12 @@ export const getBlockExplorerUrl = (id: string) => {
 };
 
 // Blockchain API V1
+export const sendTransfer = (sendBlock: string) =>
+  Block_API_v1.post("/SendTransfer2", sendBlock, {
+    headers: {
+      "Content-Type": "text/json"
+    }
+  });
 export const searchDao = (q: string) => Block_API_v1.get("/FindDaos?q=" + q);
 // Get a Tx block by AccountId
 export const GetLastBlock = (accountId: string) =>

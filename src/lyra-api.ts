@@ -1,5 +1,12 @@
+import moment from "moment";
+const stringify = require("json-stable-stringify");
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
+
+export enum BlockTypes {
+  SendTransfer = 31,
+  ReceiveTransfer = 32
+}
 
 export class LyraApi {
   private network: string;
@@ -28,18 +35,50 @@ export class LyraApi {
 
   async send(amount: number, destAddr: string, token: string) {
     try {
-      // if (this.ws.state === WebsocketReadyStates.CLOSED) {
-      //   await this.ws.open();
-      // }
-      // const balanceResp = await this.ws.call("Send", [
-      //   this.accountId,
-      //   amount,
-      //   destAddr,
-      //   token
-      // ]);
-      // return balanceResp.result;
+      var ret = await nodeApi.GetLastBlock(this.accountId);
+      var lsb = await nodeApi.lastServiceHash();
+      var block = JSON.parse(ret.data.blockData);
+      //console.log("block", block);
+      var sendBlock = {
+        AccountID: block.AccountID,
+        Balances: block.Balances,
+        Fee: block.Fee,
+        FeeCode: block.FeeCode,
+        FeeType: block.FeeType,
+        NonFungibleToken: null,
+        VoteFor: block.VoteFor,
+        Height: block.Height + 1,
+        TimeStamp: new Date().toISOString(),
+        Version: 11,
+        BlockType: BlockTypes.SendTransfer,
+        PreviousHash: block.Hash,
+        ServiceHash: lsb.data,
+        Tags: null,
+        DestinationAccountId: destAddr
+      };
+      sendBlock.Balances[token] -= amount * 600000000;
+      var json = stringify(sendBlock);
+      json = json.replace(',"Fee":1,', ',"Fee":1.0,');
+      //console.log("original block:", sendBlock);
+      console.log("json to hash:", json);
+
+      var hash = LyraCrypto.Hash(json);
+      const signature = LyraCrypto.Sign(hash, this.prvKey);
+      console.log(`Hash is: ${hash} and signature is ${signature}`);
+      var finalBlock = {
+        ...sendBlock,
+        Signature: signature,
+        Hash: hash
+      };
+
+      var finalJson = JSON.stringify(finalBlock);
+      console.log("sendBlock", finalJson);
+
+      var sendRet = await nodeApi.sendTransfer(finalJson);
+      console.log("sendRet", sendRet);
+      return false;
     } catch (error) {
-      console.log("ws send error", error);
+      console.log("send error", error);
       throw error;
     }
   }

@@ -42,7 +42,7 @@ export const getBlockExplorerUrl = (id: string) => {
 
 // Blockchain API V1
 export const sendTransfer = (sendBlock: string) =>
-  Block_API_v1.post("/SendTransfer2", sendBlock, {
+  Block_API_v1.post("/SendTransfer", sendBlock, {
     headers: {
       "Content-Type": "text/json"
     }

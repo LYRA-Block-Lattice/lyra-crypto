@@ -58,6 +58,7 @@
     ]
   },
   "dependencies": {
+    "asn1js": "^3.0.5",
     "crypto": "^1.0.1",
     "json-stable-stringify": "^1.0.2",
     "moment": "^2.29.4"

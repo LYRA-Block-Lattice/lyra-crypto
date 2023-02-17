@@ -2,6 +2,7 @@
 var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
 import crypto from "crypto";
+import * as asn1lib from "asn1js";
 
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
@@ -149,20 +150,23 @@ export class LyraCrypto {
   }
 
   static convertDerToP1393(bcSignature: Uint8Array): Uint8Array {
-    const asn1 = KJUR.asn1.ASN1Util.getHexOfTLV_AtObj(bcSignature, 0);
-    const seq = new KJUR.asn1(asn1);
-    const r = seq.sub[0].getHexStringValue();
-    const s = seq.sub[1].getHexStringValue();
-    const buff = new Uint8Array(r.length / 2 + s.length / 2);
+    const asn1 = asn1lib.fromBER(bcSignature.buffer);
+    console.log("asn1: ", asn1);
 
-    for (let i = 0; i < r.length; i += 2) {
-      buff[i / 2] = parseInt(r.substr(i, 2), 16);
-    }
+    const bcDerSequence = asn1.result as asn1lib.Sequence;
+    console.log("bcDerSequence: ", bcDerSequence);
 
-    for (let i = 0; i < s.length; i += 2) {
-      buff[r.length / 2 + i / 2] = parseInt(s.substr(i, 2), 16);
-    }
+    const bcR = bcDerSequence.valueBlock.value[0] as asn1lib.Integer;
+    console.log("bcR: ", bcR);
 
+    const bcS = bcDerSequence.valueBlock.value[1] as asn1lib.Integer;
+    console.log("bcS: ", bcS);
+
+    const buff = new Uint8Array(
+      bcR.valueBlock.valueHexView.length + bcS.valueBlock.valueHexView.length
+    );
+    buff.set(bcR.valueBlock.valueHexView, 0);
+    buff.set(bcS.valueBlock.valueHexView, bcR.valueBlock.valueHexView.length);
     return buff;
   }
 
@@ -193,7 +197,11 @@ export class LyraCrypto {
     const buff = this.toHexString(this.toUTF8Array(msg));
     sig.updateHex(buff);
     const sigValueHex = sig.sign();
-    return sigValueHex;
+
+    // convert to P1393
+    const sigbuff = this.fromHexString(sigValueHex);
+    const sigbuff2 = this.convertDerToP1393(sigbuff);
+    return bs58.encode(sigbuff2);
   }
 
   static Sign2(msg: string, privateKey: string) {

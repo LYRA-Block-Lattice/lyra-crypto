@@ -58,6 +58,7 @@ export class LyraApi {
       };
       sendBlock.Balances[token] -= amount * 600000000;
       var json = stringify(sendBlock);
+      // hack: to compatible with Newtonsoft.Json
       json = json.replace(',"Fee":1,', ',"Fee":1.0,');
       //console.log("original block:", sendBlock);
       console.log("json to hash:", json);

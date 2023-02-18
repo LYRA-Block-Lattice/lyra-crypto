@@ -57,7 +57,7 @@ export class LyraApi {
       sendBlock.DestinationAccountId = destAddr;
 
       const finalJson = sendBlock.toJson(this, sb);
-      console.log("sendBlock", finalJson);
+      //console.log("sendBlock", finalJson);
 
       var sendRet = await nodeApi.sendTransfer(finalJson);
       //console.log("sendRet", sendRet);
@@ -72,7 +72,7 @@ export class LyraApi {
     while (true) {
       try {
         var unrecv = await nodeApi.getUnreceived(this.accountId);
-        console.log("changes", unrecv.data);
+        //console.log("changes", unrecv.data);
 
         if (unrecv.data.resultCode == 0) {
           // success.
@@ -80,7 +80,7 @@ export class LyraApi {
           var sb = JSON.parse(lsb.data.blockData);
 
           var ret = await nodeApi.GetLastBlock(this.accountId);
-          console.log("last block", ret.data);
+          //console.log("last block", ret.data);
           var receiveBlock =
             ret.data.resultCode == 0
               ? new ReceiveTransferBlock(ret.data.blockData)
@@ -91,7 +91,7 @@ export class LyraApi {
           const changesArray: [string, number][] = Object.entries(
             unrecv.data.transfer.changes
           );
-          console.log("changesArray", changesArray);
+          //console.log("changesArray", changesArray);
           changesArray.forEach(([key, value]) => {
             if (key != undefined) {
               if (receiveBlock.Balances.hasOwnProperty(key))
@@ -142,24 +142,10 @@ export class LyraApi {
     }
   }
 
-  async history(startTimeUtc: Date, endTimeUtc: Date, count: number) {
+  async history(start: Date, end: Date, count: number) {
     try {
-      // // json time. convert it to dotnet time
-      // const dtStart = new Date(
-      //   new Date(1970, 0, 1, 0, 0, 0, 0).getTime() + startTime * 10000
-      // );
-      // const dtEnd = new Date(
-      //   new Date(1970, 0, 1, 0, 0, 0, 0).getTime() + endTime * 10000
-      // );
-      // const hists = await _node.SearchTransactionsAsync(
-      //   accountId,
-      //   dtStart.getTime(),
-      //   dtEnd.getTime(),
-      //   count
-      // );
-      // if (hists.Successful())
-      //   return hists.Transactions.map((x) => new TxDesc(x));
-      // else throw new Error(`${hists.ResultCode}: ${hists.ResultMessage}`);
+      const hists = await nodeApi.getHistory(this.accountId, start, end, count);
+      return hists.data;
     } catch (error) {
       console.log("history error", error);
       throw error;

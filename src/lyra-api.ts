@@ -8,7 +8,12 @@ import {
   SendTransferBlock,
   TokenGenesisBlock
 } from "./blocks/block";
-import { ContractTypes, NonFungibleTokenTypes } from "./blocks/meta";
+import {
+  AuthorizationAPIResult,
+  ContractTypes,
+  HoldTypes,
+  NonFungibleTokenTypes
+} from "./blocks/meta";
 
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -226,7 +231,7 @@ export class LyraApi {
     description: string,
     supply: number,
     metadataUri: string,
-    owner: string | null // shop name
+    owner: string | null
   ) {
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);
@@ -258,6 +263,73 @@ export class LyraApi {
       gensBlock.Custom1 = name;
       gensBlock.Custom2 = metadataUri;
       gensBlock.Custom3 = null;
+      gensBlock.Tags = null;
+
+      gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
+
+      const finalJson = gensBlock.toJson(this, sb);
+      console.log("sendBlock", finalJson);
+
+      var sendRet = await nodeApi.mintToken(finalJson);
+      //console.log("sendRet", sendRet);
+      return sendRet.data;
+    } catch (error) {
+      console.log("mintToken error", error);
+      throw error;
+    }
+  }
+
+  async createTOT(
+    type: HoldTypes,
+    name: string,
+    description: string,
+    supply: number,
+    metadataUri: string,
+    descSignature: string,
+    owner: string | null
+  ): Promise<AuthorizationAPIResult> {
+    try {
+      var ret = await nodeApi.GetLastBlock(this.accountId);
+      var lsb = await nodeApi.getLastServiceBlock();
+      var sb = JSON.parse(lsb.data.blockData);
+
+      const domainName = (() => {
+        switch (type) {
+          case HoldTypes.NFT:
+            return "nft";
+          case HoldTypes.Fiat:
+            return "fiat";
+          case HoldTypes.SVC:
+            return "svc";
+          default:
+            return "tot";
+        }
+      })();
+
+      const ticker = domainName + "/" + uuidv4();
+      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+
+      gensBlock.Ticker = ticker;
+      gensBlock.DomainName = domainName;
+      gensBlock.ContractType = ContractTypes.TradeOnlyToken;
+      let currentDate = new Date();
+      // Set the year to 100 years later
+      currentDate.setFullYear(currentDate.getFullYear() + 100);
+      gensBlock.RenewalDate = currentDate;
+      gensBlock.Edition = 1;
+      gensBlock.Description = description;
+      gensBlock.Precision = 0;
+      gensBlock.IsFinalSupply = true;
+      gensBlock.NonFungibleType = NonFungibleTokenTypes.TradeOnly;
+      gensBlock.NonFungibleKey = "";
+      gensBlock.Owner = owner;
+      gensBlock.Address = null;
+      gensBlock.Currency = null;
+      gensBlock.Icon = null;
+      gensBlock.Image = null;
+      gensBlock.Custom1 = name;
+      gensBlock.Custom2 = metadataUri;
+      gensBlock.Custom3 = descSignature;
       gensBlock.Tags = null;
 
       gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;

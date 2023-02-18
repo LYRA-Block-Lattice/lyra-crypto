@@ -228,3 +228,19 @@ export enum ContractTypes {
 
   Custom = 1000
 }
+
+export enum HoldTypes {
+  Token,
+  NFT,
+  Fiat,
+  TOT,
+  SVC
+}
+
+export class APIResult {
+  public ResultCode: APIResultCodes;
+  public ResultMessage: string;
+}
+export class AuthorizationAPIResult extends APIResult {
+  public TxHash: string;
+}

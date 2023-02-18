@@ -49,8 +49,8 @@ export const sendTransfer = (sendBlock: string) =>
       "Content-Type": "text/json"
     }
   });
-export const recvTransfer = (recvBlock: string) =>
-  Block_API_v1.post("/ReceiveTransfer", recvBlock, {
+export const recvTransfer = (receiveBlock: string) =>
+  Block_API_v1.post("/ReceiveTransfer", receiveBlock, {
     headers: {
       "Content-Type": "text/json"
     }

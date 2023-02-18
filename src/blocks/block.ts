@@ -132,7 +132,6 @@ export class TransactionBlock extends Block {
     this.AccountID = wallet.accountId;
     // setup service block related fields
     this.FeeCode = sb.FeeTicker;
-    this.FeeType = AuthorizationFeeTypes.Regular;
     return super.toJson(wallet, sb);
   }
 }
@@ -156,6 +155,7 @@ export class SendTransferBlock extends TransactionBlock {
   toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
     // setup service block related fields
     this.Fee = sb.TransferFee;
+    this.FeeType = AuthorizationFeeTypes.Regular;
     this.Balances[sb.FeeTicker] -= sb.TransferFee * LyraGlobal.BALANCERATIO;
     return super.toJson(wallet, sb);
   }
@@ -180,6 +180,7 @@ export class ReceiveTransferBlock extends TransactionBlock {
   toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
     // setup service block related fields
     this.Fee = 0;
+    this.FeeType = AuthorizationFeeTypes.NoFee;
     return super.toJson(wallet, sb);
   }
 }

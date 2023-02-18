@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import moment from "moment";
 import {
   LyraGlobal,
@@ -66,33 +67,57 @@ export class LyraApi {
   }
 
   async receive() {
-    try {
-      var unrecv = await nodeApi.getUnreceived(this.accountId);
-      if (unrecv.data.resultCode == 0) {
-        // success.
-        var lsb = await nodeApi.getLastServiceBlock();
-        var sb = JSON.parse(lsb.data.blockData);
-        var ret = await nodeApi.GetLastBlock(this.accountId);
-        var receiveBlock =
-          ret.data.resultCode == 0
-            ? new ReceiveTransferBlock(ret.data.blockData)
-            : new OpenWithReceiveTransferBlock(undefined);
+    while (true) {
+      try {
+        var unrecv = await nodeApi.getUnreceived(this.accountId);
+        console.log("changes", unrecv.data);
 
-        receiveBlock.SourceHash = unrecv.data.sourceHash;
+        if (unrecv.data.resultCode == 0) {
+          // success.
+          var lsb = await nodeApi.getLastServiceBlock();
+          var sb = JSON.parse(lsb.data.blockData);
 
-        unrecv.data.transfer.changes.forEach((change: any) => {
-          receiveBlock.Balances[change.key] += change.value * 100000000;
-        });
+          var ret = await nodeApi.GetLastBlock(this.accountId);
+          console.log("last block", ret.data);
+          var receiveBlock =
+            ret.data.resultCode == 0
+              ? new ReceiveTransferBlock(ret.data.blockData)
+              : new OpenWithReceiveTransferBlock(undefined);
 
-        const finalJson = receiveBlock.toJson(this, sb);
-        const recvret = await nodeApi.recvTransfer(finalJson);
-        return recvret.data;
-      } else {
-        // no new unreceived block.
+          receiveBlock.SourceHash = unrecv.data.sourceHash;
+
+          const changesArray: [string, number][] = Object.entries(
+            unrecv.data.transfer.changes
+          );
+          console.log("changesArray", changesArray);
+          changesArray.forEach(([key, value]) => {
+            if (key != undefined) {
+              if (receiveBlock.Balances.hasOwnProperty(key))
+                receiveBlock.Balances[key] += value * 100000000;
+              else receiveBlock.Balances[key] = value * 100000000;
+            }
+          });
+
+          const finalJson = receiveBlock.toJson(this, sb);
+          const recvret = await nodeApi.recvTransfer(finalJson);
+
+          if (recvret.data.resultCode == 0) {
+            // continue to receive next block.
+          } else {
+            return recvret.data;
+          }
+        } else {
+          // no new unreceived block.
+          return unrecv.data;
+        }
+      } catch (error) {
+        console.log("receive error", error);
+        if (error instanceof AxiosError) {
+          console.log("detailed AxiosError", error.response?.data.errors);
+        }
+
+        throw error;
       }
-    } catch (error) {
-      console.log("receive error", error);
-      throw error;
     }
   }
 

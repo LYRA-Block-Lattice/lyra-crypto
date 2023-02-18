@@ -69,8 +69,9 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(result?.balance["LYR"]).toBeGreaterThan(10000);
   });
 
-  it("works with send", async () => {
+  it("works with send and receive", async () => {
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
+    const dstpvt = "yEEj2uvCQji75Qps4jZdPRZj7KtFoeW2dh7pmfXjEuYXK9Uz3";
     const dst =
       "LUT5jYomQHCJQhG3Co7GadEtohpwwYtyYz1vABHGeDkLDpSJGXFfpYgD9XckRXQg2Hv2Yrb2Ade3jbecZpLf4hbVho6b5n"; // test 4
     const wallet = new LyraApi(network, pvk);
@@ -78,17 +79,31 @@ describe("Lyra Crypto Library Test", (): void => {
     const result = await wallet.balance();
     expect(result).toBeDefined();
 
+    const dstWallet = new LyraApi(network, dstpvt);
+    await dstWallet.init();
+    const dstResult = await dstWallet.balance();
+    expect(dstResult).toBeDefined();
+
     const result2 = await wallet.send(1, dst, "LYR");
     expect(result2.resultCode).toBe(0);
     expect(result2.resultMessage).toBe("Success");
 
     const balaceResult = await wallet.balance();
     expect(result?.balance["LYR"] - balaceResult?.balance["LYR"]).toBe(2); // amount + send fee
-    //var delta = result!.balance["LYR"] - result2.balance["LYR"];
-    //expect(delta).toEqual(2);
+
+    const recvResult = await dstWallet.receive();
+    if (recvResult.resultCode != 0 && recvResult.resultCode != 30)
+      console.log(recvResult);
+    expect(recvResult.resultCode == 0 || recvResult.resultCode == 30).toBe(
+      true
+    );
+    const dstBalaceResult = await dstWallet.balance();
+    expect(
+      dstBalaceResult?.balance["LYR"] - dstResult?.balance["LYR"]
+    ).toBeGreaterThanOrEqual(1); // amount
   });
 
-  it("works with send & receive", async () => {
+  it("wallet genesis", async () => {
     const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
     const dst =
@@ -106,12 +121,12 @@ describe("Lyra Crypto Library Test", (): void => {
     // const result2 = await wallet.send(1, dst, "LYR");
     // expect(result2).toBeDefined();
 
-    // var delta = result.balance["LYR"] - result2.balance["LYR"];
+    // var delta = result!.balance["LYR"] - result2!.balance["LYR"];
     // expect(delta).toEqual(2);
 
     // const result6 = await wallet2.receive();
     // expect(result6).toBeDefined();
-    // var delta2 = result6.balance["LYR"] - result5.balance["LYR"];
+    // var delta2 = result6!.balance["LYR"] - result5!.balance["LYR"];
     // console.log("delta2 is ", delta2);
     // expect(delta2).toEqual(1);
 

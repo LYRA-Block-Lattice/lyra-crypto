@@ -33,7 +33,7 @@ export class Block {
   toJson(wallet: LyraApi): string {
     var json = stringify(this);
     // hack: to compatible with Newtonsoft.Json
-    json = json.replace(',"Fee":1,', ',"Fee":1.0,');
+    //json = json.replace(',"Fee":1,', ',"Fee":1.0,');
     //console.log("original block:", sendBlock);
     console.log("json to hash:", json);
 

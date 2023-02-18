@@ -7,6 +7,7 @@ require("dotenv").config();
 jest.setTimeout(60000);
 
 const network = process.env.REACT_APP_NETWORK_ID!;
+console.log("network: " + network);
 
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {
@@ -72,7 +73,7 @@ describe("Lyra Crypto Library Test", (): void => {
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
     const dst =
       "LUT5jYomQHCJQhG3Co7GadEtohpwwYtyYz1vABHGeDkLDpSJGXFfpYgD9XckRXQg2Hv2Yrb2Ade3jbecZpLf4hbVho6b5n"; // test 4
-    const wallet = new LyraApi("testnet", pvk);
+    const wallet = new LyraApi(network, pvk);
     await wallet.init();
     const result = await wallet.balance();
     expect(result).toBeDefined();

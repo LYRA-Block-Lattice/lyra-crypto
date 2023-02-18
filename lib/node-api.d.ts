@@ -1,0 +1,15 @@
+export declare const InitAxios: () => void;
+export declare const getBlockExplorerUrl: (id: string) => string;
+export declare const sendTransfer: (sendBlock: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const searchDao: (q: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const GetLastBlock: (accountId: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const getTradeForOrder: (orderId: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const lastServiceHash: () => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const getBalance: (accountId: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const fetchOrders: (catalog: string | undefined) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const fetchOrderById: (orderId: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const fetchOrdersByOwner: (owner: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const fetchTradesByOwner: (owner: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const fetchDealer: () => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const uploadFile: (formData: FormData) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const createNFTMeta: (accountId: string, signature: string, name: string, description: string, imgUrl: string) => Promise<import("axios").AxiosResponse<any, any>>;

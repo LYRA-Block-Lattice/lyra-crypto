@@ -4,9 +4,14 @@ export declare class LyraApi {
     private prvKey;
     private accountId;
     constructor(network: string, privateKey: string, node?: string);
-    send(amount: number, destAddr: string, token: string): Promise<void>;
+    init(): void;
+    sign(data: string): string;
+    send(amount: number, destAddr: string, token: string): Promise<any>;
     receive(): Promise<void>;
-    balance(): Promise<void>;
+    balance(): Promise<{
+        data: any;
+        balance: any;
+    } | undefined>;
     history(startTimeUtc: Date, endTimeUtc: Date, count: number): Promise<void>;
     close(): void;
 }

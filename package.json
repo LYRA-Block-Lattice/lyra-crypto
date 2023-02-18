@@ -1,6 +1,6 @@
 {
   "name": "lyra-crypto",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",

@@ -41,12 +41,22 @@ export const getBlockExplorerUrl = (id: string) => {
 };
 
 // Blockchain API V1
+export const getLastServiceBlock = () =>
+  Block_API_v1.get("/GetLastServiceBlock");
 export const sendTransfer = (sendBlock: string) =>
   Block_API_v1.post("/SendTransfer", sendBlock, {
     headers: {
       "Content-Type": "text/json"
     }
   });
+export const recvTransfer = (recvBlock: string) =>
+  Block_API_v1.post("/ReceiveTransfer", recvBlock, {
+    headers: {
+      "Content-Type": "text/json"
+    }
+  });
+export const getUnreceived = (accountId: string) =>
+  Block_API_v1.get("/LookForNewTransfer2?AccountId=" + accountId);
 export const searchDao = (q: string) => Block_API_v1.get("/FindDaos?q=" + q);
 // Get a Tx block by AccountId
 export const GetLastBlock = (accountId: string) =>
@@ -105,6 +115,13 @@ export const createNFTMeta = (
     }
   );
 
+export function receiveTransfer(finalJson: string) {
+  throw new Error("Function not implemented.");
+}
+
+export function getUnreceivedBlocks(accountId: string) {
+  throw new Error("Function not implemented.");
+}
 // API.interceptors.request.use((req) => {
 //   if (localStorage.getItem("profile")) {
 //     req.headers.Authorization = `LyraDeX ${

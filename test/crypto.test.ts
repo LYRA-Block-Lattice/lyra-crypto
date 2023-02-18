@@ -81,6 +81,9 @@ describe("Lyra Crypto Library Test", (): void => {
     const result2 = await wallet.send(1, dst, "LYR");
     expect(result2.resultCode).toBe(0);
     expect(result2.resultMessage).toBe("Success");
+
+    const balaceResult = await wallet.balance();
+    expect(result?.balance["LYR"] - balaceResult?.balance["LYR"]).toBe(2); // amount + send fee
     //var delta = result!.balance["LYR"] - result2.balance["LYR"];
     //expect(delta).toEqual(2);
   });

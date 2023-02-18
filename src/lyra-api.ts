@@ -1,5 +1,10 @@
 import moment from "moment";
-import { SendTransferBlock } from "./blocks/block";
+import {
+  LyraGlobal,
+  OpenWithReceiveTransferBlock,
+  ReceiveTransferBlock,
+  SendTransferBlock
+} from "./blocks/block";
 
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -8,7 +13,7 @@ export class LyraApi {
   private network: string;
   private nodeAddress?: string;
   private prvKey: string;
-  private accountId: string;
+  accountId: string;
 
   constructor(network: string, privateKey: string, node?: string) {
     this.network = network;
@@ -36,16 +41,19 @@ export class LyraApi {
   async send(amount: number, destAddr: string, token: string) {
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);
-      var lsb = await nodeApi.lastServiceHash();
-
-      const block = JSON.parse(ret.data.blockData);
+      var lsb = await nodeApi.getLastServiceBlock();
+      var sb = JSON.parse(lsb.data.blockData);
 
       var sendBlock = new SendTransferBlock(ret.data.blockData);
-      sendBlock.Balances[token] -= amount * 600000000;
-      sendBlock.ServiceHash = lsb.data;
+      console.log(
+        `Current balance is: ${
+          sendBlock.Balances[token] / LyraGlobal.BALANCERATIO
+        }`
+      );
+      sendBlock.Balances[token] -= amount * LyraGlobal.BALANCERATIO;
       sendBlock.DestinationAccountId = destAddr;
 
-      const finalJson = sendBlock.toJson(this);
+      const finalJson = sendBlock.toJson(this, sb);
       console.log("sendBlock", finalJson);
 
       var sendRet = await nodeApi.sendTransfer(finalJson);
@@ -59,13 +67,31 @@ export class LyraApi {
 
   async receive() {
     try {
-      // if (this.ws.state === WebsocketReadyStates.CLOSED) {
-      //   await this.ws.open();
-      // }
-      // const balanceResp = await this.ws.call("Receive", [this.accountId]);
-      // return balanceResp.result;
+      var unrecv = await nodeApi.getUnreceived(this.accountId);
+      if (unrecv.data.resultCode == 0) {
+        // success.
+        var lsb = await nodeApi.getLastServiceBlock();
+        var sb = JSON.parse(lsb.data.blockData);
+        var ret = await nodeApi.GetLastBlock(this.accountId);
+        var receiveBlock =
+          ret.data.resultCode == 0
+            ? new ReceiveTransferBlock(ret.data.blockData)
+            : new OpenWithReceiveTransferBlock(undefined);
+
+        receiveBlock.SourceHash = unrecv.data.sourceHash;
+
+        unrecv.data.transfer.changes.forEach((change: any) => {
+          receiveBlock.Balances[change.key] += change.value * 100000000;
+        });
+
+        const finalJson = receiveBlock.toJson(this, sb);
+        const recvret = await nodeApi.recvTransfer(finalJson);
+        return recvret.data;
+      } else {
+        // no new unreceived block.
+      }
     } catch (error) {
-      console.log("ws receive error", error);
+      console.log("receive error", error);
       throw error;
     }
   }

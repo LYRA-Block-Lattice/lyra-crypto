@@ -169,11 +169,11 @@ export class LyraApi {
     precision: number,
     supply: number,
     isFinalSupply: boolean,
-    owner: string, // shop name
-    address: string, // shop URL
-    currency: string, // USD
+    owner: string | null, // shop name
+    address: string | null, // shop URL
+    currency: string | null, // USD
     contractType: ContractTypes, // reward or discount or custom
-    tags: Record<string, string>
+    tags: Record<string, string> | null
   ) {
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);

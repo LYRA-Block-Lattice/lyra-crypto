@@ -239,8 +239,9 @@ export class TokenGenesisBlock extends ReceiveTransferBlock {
   constructor(blockData: string | undefined) {
     super(blockData);
     if (blockData === undefined) {
-    } else {
       throw new Error("Should not be called with blockData");
+    } else {
+      this.IsNonFungible = false;
     }
   }
 

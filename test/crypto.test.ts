@@ -1,6 +1,7 @@
 /* globals describe, expect, test */
 import { LyraCrypto } from "../src/lyra-crypto";
 import { LyraApi } from "../src/lyra-api";
+import { ContractTypes } from "../src/blocks/meta";
 
 require("dotenv").config();
 
@@ -110,19 +111,35 @@ describe("Lyra Crypto Library Test", (): void => {
     console.log("hist is ", hist);
   });
 
-  it("wallet genesis", async () => {
+  it("wallet genesis and token mint", async () => {
     const keys = LyraCrypto.GenerateWallet();
     const wallet = new LyraApi(network, keys.privateKey);
 
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
     const srcWallet = new LyraApi(network, pvk);
 
-    await srcWallet.send(1, keys.accountId, "LYR");
+    await srcWallet.send(10100, keys.accountId, "LYR");
     const ret = await wallet.receive();
     expect(ret.resultCode).toBe(30);
     const balanceResult = await wallet.balance();
-    expect(balanceResult?.balance["LYR"]).toBe(1);
+    expect(balanceResult?.balance["LYR"]).toBe(10100);
 
+    const mintRet = await wallet.mintToken(
+      "TEST",
+      "jesttest",
+      "Jest test",
+      8,
+      1000000,
+      true,
+      null,
+      null,
+      null,
+      ContractTypes.Cryptocurrency,
+      null
+    );
+    expect(mintRet.resultCode).toBe(0);
+    const balanceResult2 = await wallet.balance();
+    expect(balanceResult2?.balance["jesttest/TEST"]).toBe(1000000);
     // const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     // const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
     // const dst =

@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import {
   LyraGlobal,
@@ -7,7 +8,7 @@ import {
   SendTransferBlock,
   TokenGenesisBlock
 } from "./blocks/block";
-import { ContractTypes } from "./blocks/meta";
+import { ContractTypes, NonFungibleTokenTypes } from "./blocks/meta";
 
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -205,6 +206,59 @@ export class LyraApi {
       gensBlock.Custom2 = null;
       gensBlock.Custom3 = null;
       gensBlock.Tags = tags;
+
+      gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
+
+      const finalJson = gensBlock.toJson(this, sb);
+      console.log("sendBlock", finalJson);
+
+      var sendRet = await nodeApi.mintToken(finalJson);
+      //console.log("sendRet", sendRet);
+      return sendRet.data;
+    } catch (error) {
+      console.log("mintToken error", error);
+      throw error;
+    }
+  }
+
+  async mintNFT(
+    name: string,
+    description: string,
+    supply: number,
+    metadataUri: string,
+    owner: string | null // shop name
+  ) {
+    try {
+      var ret = await nodeApi.GetLastBlock(this.accountId);
+      var lsb = await nodeApi.getLastServiceBlock();
+      var sb = JSON.parse(lsb.data.blockData);
+
+      const domainName = "nft";
+      const ticker = domainName + "/" + uuidv4();
+      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+
+      gensBlock.Ticker = ticker;
+      gensBlock.DomainName = domainName;
+      gensBlock.ContractType = ContractTypes.Collectible;
+      let currentDate = new Date();
+      // Set the year to 100 years later
+      currentDate.setFullYear(currentDate.getFullYear() + 100);
+      gensBlock.RenewalDate = currentDate;
+      gensBlock.Edition = 1;
+      gensBlock.Description = description;
+      gensBlock.Precision = 0;
+      gensBlock.IsFinalSupply = true;
+      gensBlock.NonFungibleType = NonFungibleTokenTypes.Collectible;
+      gensBlock.NonFungibleKey = "";
+      gensBlock.Owner = owner;
+      gensBlock.Address = null;
+      gensBlock.Currency = null;
+      gensBlock.Icon = null;
+      gensBlock.Image = null;
+      gensBlock.Custom1 = name;
+      gensBlock.Custom2 = metadataUri;
+      gensBlock.Custom3 = null;
+      gensBlock.Tags = null;
 
       gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
 

@@ -55,6 +55,12 @@ export const recvTransfer = (receiveBlock: string) =>
       "Content-Type": "text/json"
     }
   });
+export const recvTransferWithOpenAccount = (openReceiveBlock: string) =>
+  Block_API_v1.post("/ReceiveTransferAndOpenAccount", openReceiveBlock, {
+    headers: {
+      "Content-Type": "text/json"
+    }
+  });
 export const mintToken = (tokenBlock: string) =>
   Block_API_v1.post("/CreateToken", tokenBlock, {
     headers: {
@@ -63,6 +69,37 @@ export const mintToken = (tokenBlock: string) =>
   });
 export const getUnreceived = (accountId: string) =>
   Block_API_v1.get("/LookForNewTransfer2?AccountId=" + accountId);
+
+export const getHistory = (
+  accountId: string,
+  start: Date,
+  end: Date,
+  count: number
+) => {
+  const toTicks = (date: Date) => {
+    const utcDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60 * 1000
+    );
+
+    // Convert the UTC date to a long value
+    const longValue = utcDate.getTime();
+
+    // Convert the long value to a .NET DateTime object by ticks
+    const ticks = longValue * 10000 + 621355968000000000;
+    return ticks;
+  };
+  return Block_API_v1.get(
+    "/SearchTransactions?accountId=" +
+      accountId +
+      "&startTimeTicks=" +
+      toTicks(start) +
+      "&endTimeTicks=" +
+      toTicks(end) +
+      "&count=" +
+      count
+  );
+};
+
 export const searchDao = (q: string) => Block_API_v1.get("/FindDaos?q=" + q);
 // Get a Tx block by AccountId
 export const GetLastBlock = (accountId: string) =>

@@ -16,6 +16,13 @@ export declare enum AccountTypes {
     Fiat = 31,
     TOT = 32
 }
+export declare enum AuthorizationFeeTypes {
+    NoFee = 0,
+    Regular = 1,
+    BothParties = 2,
+    Dynamic = 3,
+    FullFee = 4
+}
 export declare enum BlockTypes {
     Null = 0,
     Service = 11,
@@ -90,4 +97,23 @@ export declare enum BlockTypes {
     FiatTokenBurn = 132,
     FiatSendToken = 133,
     FiatRecvToken = 134
+}
+export declare enum ContractTypes {
+    Default = 0,
+    RewardPoint = 10,
+    RedeemedDiscount = 20,
+    GiftCard = 30,
+    DiscountCoupon = 40,
+    StoreCredit = 50,
+    Cryptocurrency = 100,
+    FiatCurrency = 200,
+    Collectible = 300,
+    TradeOnlyToken = 400,
+    Custom = 1000
+}
+export declare enum NonFungibleTokenTypes {
+    NotSet = 0,
+    LoyaltyDiscount = 1,
+    Collectible = 2,
+    TradeOnly = 3
 }

@@ -206,6 +206,13 @@ export class OpenWithReceiveTransferBlock extends ReceiveTransferBlock {
   GetBlockType(): BlockTypes {
     return BlockTypes.OpenAccountWithReceiveTransfer;
   }
+
+  toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
+    // setup service block related fields
+    this.Fee = 0;
+    this.FeeType = AuthorizationFeeTypes.NoFee;
+    return super.toJson(wallet, sb);
+  }
 }
 
 export class TokenGenesisBlock extends ReceiveTransferBlock {

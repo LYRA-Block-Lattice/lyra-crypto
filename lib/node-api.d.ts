@@ -1,6 +1,11 @@
 export declare const InitAxios: () => void;
 export declare const getBlockExplorerUrl: (id: string) => string;
+export declare const getLastServiceBlock: () => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const sendTransfer: (sendBlock: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const recvTransfer: (receiveBlock: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const mintToken: (tokenBlock: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const getUnreceived: (accountId: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare const getHistory: (accountId: string, start: Date, end: Date, count: number) => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const searchDao: (q: string) => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const GetLastBlock: (accountId: string) => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const getTradeForOrder: (orderId: string) => Promise<import("axios").AxiosResponse<any, any>>;
@@ -13,3 +18,5 @@ export declare const fetchTradesByOwner: (owner: string) => Promise<import("axio
 export declare const fetchDealer: () => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const uploadFile: (formData: FormData) => Promise<import("axios").AxiosResponse<any, any>>;
 export declare const createNFTMeta: (accountId: string, signature: string, name: string, description: string, imgUrl: string) => Promise<import("axios").AxiosResponse<any, any>>;
+export declare function receiveTransfer(finalJson: string): void;
+export declare function getUnreceivedBlocks(accountId: string): void;

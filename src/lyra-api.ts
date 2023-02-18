@@ -101,7 +101,11 @@ export class LyraApi {
           });
 
           const finalJson = receiveBlock.toJson(this, sb);
-          const recvret = await nodeApi.recvTransfer(finalJson);
+          console.log("receiveBlock", finalJson);
+          const recvret =
+            ret.data.resultCode == 0
+              ? await nodeApi.recvTransfer(finalJson)
+              : await nodeApi.recvTransferWithOpenAccount(finalJson);
 
           if (recvret.data.resultCode == 0) {
             // continue to receive next block.

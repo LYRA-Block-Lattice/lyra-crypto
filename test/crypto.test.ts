@@ -4,7 +4,7 @@ import { LyraApi } from "../src/lyra-api";
 
 require("dotenv").config();
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 const network = process.env.REACT_APP_NETWORK_ID!;
 console.log("network: " + network);
@@ -101,15 +101,34 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(
       dstBalaceResult?.balance["LYR"] - dstResult?.balance["LYR"]
     ).toBeGreaterThanOrEqual(1); // amount
+
+    // history
+    var dtStart = new Date(Date.now());
+    dtStart.setDate(dtStart.getDate() - 1);
+    var hist = await wallet.history(dtStart, new Date(Date.now()), 10);
+    expect(hist).toBeDefined();
+    console.log("hist is ", hist);
   });
 
   it("wallet genesis", async () => {
-    const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
-    const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
-    const dst =
-      "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
-    const wallet = new LyraApi(network, pvk);
-    await wallet.init();
+    const keys = LyraCrypto.GenerateWallet();
+    const wallet = new LyraApi(network, keys.privateKey);
+
+    const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
+    const srcWallet = new LyraApi(network, pvk);
+
+    await srcWallet.send(1, keys.accountId, "LYR");
+    const ret = await wallet.receive();
+    expect(ret.resultCode).toBe(30);
+    const balanceResult = await wallet.balance();
+    expect(balanceResult?.balance["LYR"]).toBe(1);
+
+    // const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
+    // const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
+    // const dst =
+    //   "LUTAq9MFf4vaqbEEDHsRj8SUbLWoKptndaUqXSnYbi7mC1cXajts6fWXhQUuwR4ZX7DnvERkUMpwXKf4XKk4NjVMxqYvmn";
+    // const wallet = new LyraApi(network, pvk);
+    // await wallet.init();
     // const result = await wallet.balance();
     // expect(result).toBeDefined();
 

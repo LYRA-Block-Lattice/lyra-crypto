@@ -55,6 +55,12 @@ export const recvTransfer = (receiveBlock: string) =>
       "Content-Type": "text/json"
     }
   });
+export const mintToken = (tokenBlock: string) =>
+  Block_API_v1.post("/CreateToken", tokenBlock, {
+    headers: {
+      "Content-Type": "text/json"
+    }
+  });
 export const getUnreceived = (accountId: string) =>
   Block_API_v1.get("/LookForNewTransfer2?AccountId=" + accountId);
 export const searchDao = (q: string) => Block_API_v1.get("/FindDaos?q=" + q);

@@ -188,3 +188,43 @@ export enum BlockTypes {
   FiatSendToken = 133,
   FiatRecvToken = 134
 }
+
+export enum ContractTypes {
+  Default = 0,
+
+  RewardPoint = 10,
+
+  RedeemedDiscount = 20,
+
+  GiftCard = 30,
+
+  DiscountCoupon = 40,
+
+  StoreCredit = 50,
+
+  Cryptocurrency = 100,
+
+  FiatCurrency = 200,
+
+  Collectible = 300,
+
+  TradeOnlyToken = 400,
+
+  Custom = 1000
+}
+
+export enum NonFungibleTokenTypes {
+  NotSet = 0,
+
+  // LoyalShopper Shopify discount code
+  LoyaltyDiscount = 1,
+
+  // Lyra or Custom Collectible NFT
+  Collectible = 2,
+
+  // trade only token
+  TradeOnly = 3
+
+  // external NFT
+  //ERC1155 = 3,
+}

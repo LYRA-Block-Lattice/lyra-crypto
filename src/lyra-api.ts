@@ -4,8 +4,10 @@ import {
   LyraGlobal,
   OpenWithReceiveTransferBlock,
   ReceiveTransferBlock,
-  SendTransferBlock
+  SendTransferBlock,
+  TokenGenesisBlock
 } from "./blocks/block";
+import { ContractTypes } from "./blocks/meta";
 
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -142,18 +144,24 @@ export class LyraApi {
 
   async history(startTimeUtc: Date, endTimeUtc: Date, count: number) {
     try {
-      // if (this.ws.state === WebsocketReadyStates.CLOSED) {
-      //   await this.ws.open();
-      // }
-      // const histResult = await this.ws.call("History", [
-      //   this.accountId,
-      //   startTimeUtc.getTime(),
-      //   endTimeUtc.getTime(),
+      // // json time. convert it to dotnet time
+      // const dtStart = new Date(
+      //   new Date(1970, 0, 1, 0, 0, 0, 0).getTime() + startTime * 10000
+      // );
+      // const dtEnd = new Date(
+      //   new Date(1970, 0, 1, 0, 0, 0, 0).getTime() + endTime * 10000
+      // );
+      // const hists = await _node.SearchTransactionsAsync(
+      //   accountId,
+      //   dtStart.getTime(),
+      //   dtEnd.getTime(),
       //   count
-      // ]);
-      // return histResult.result;
+      // );
+      // if (hists.Successful())
+      //   return hists.Transactions.map((x) => new TxDesc(x));
+      // else throw new Error(`${hists.ResultCode}: ${hists.ResultMessage}`);
     } catch (error) {
-      console.log("ws history error", error);
+      console.log("history error", error);
       throw error;
     }
   }
@@ -162,5 +170,63 @@ export class LyraApi {
     console.log("closing lyra-api");
     this.accountId = "";
     this.prvKey = "";
+  }
+
+  async mintToken(
+    tokenName: string,
+    domainName: string,
+    description: string,
+    precision: number,
+    supply: number,
+    isFinalSupply: boolean,
+    owner: string, // shop name
+    address: string, // shop URL
+    currency: string, // USD
+    contractType: ContractTypes, // reward or discount or custom
+    tags: Record<string, string>
+  ) {
+    try {
+      var ret = await nodeApi.GetLastBlock(this.accountId);
+      var lsb = await nodeApi.getLastServiceBlock();
+      var sb = JSON.parse(lsb.data.blockData);
+
+      const ticker = domainName + "/" + tokenName;
+      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+
+      gensBlock.Ticker = ticker;
+      gensBlock.DomainName = domainName;
+      gensBlock.ContractType = contractType;
+      let currentDate = new Date();
+      // Set the year to 100 years later
+      currentDate.setFullYear(currentDate.getFullYear() + 100);
+      gensBlock.RenewalDate = currentDate;
+      gensBlock.Edition = 1;
+      gensBlock.Description = description;
+      gensBlock.Precision = precision;
+      gensBlock.IsFinalSupply = isFinalSupply;
+      gensBlock.NonFungibleType = 0;
+      gensBlock.NonFungibleKey = "";
+      gensBlock.Owner = owner;
+      gensBlock.Address = address;
+      gensBlock.Currency = currency;
+      gensBlock.Icon = null;
+      gensBlock.Image = null;
+      gensBlock.Custom1 = null;
+      gensBlock.Custom2 = null;
+      gensBlock.Custom3 = null;
+      gensBlock.Tags = tags;
+
+      gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
+
+      const finalJson = gensBlock.toJson(this, sb);
+      console.log("sendBlock", finalJson);
+
+      var sendRet = await nodeApi.mintToken(finalJson);
+      //console.log("sendRet", sendRet);
+      return sendRet.data;
+    } catch (error) {
+      console.log("mintToken error", error);
+      throw error;
+    }
   }
 }

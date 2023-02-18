@@ -1,6 +1,12 @@
 import { LyraApi } from "../lyra-api";
 import { LyraCrypto } from "../lyra-crypto";
-import { AccountTypes, AuthorizationFeeTypes, BlockTypes } from "./meta";
+import {
+  AccountTypes,
+  AuthorizationFeeTypes,
+  BlockTypes,
+  ContractTypes,
+  NonFungibleTokenTypes
+} from "./meta";
 const stringify = require("json-stable-stringify");
 
 export class LyraGlobal {
@@ -199,5 +205,46 @@ export class OpenWithReceiveTransferBlock extends ReceiveTransferBlock {
 
   GetBlockType(): BlockTypes {
     return BlockTypes.OpenAccountWithReceiveTransfer;
+  }
+}
+
+export class TokenGenesisBlock extends ReceiveTransferBlock {
+  Ticker: string;
+  DomainName: string;
+  ContractType: ContractTypes;
+  RenewalDate: Date;
+  Edition: number;
+  Description: string;
+  Precision: number;
+  IsFinalSupply: boolean;
+  IsNonFungible: boolean;
+  NonFungibleType: NonFungibleTokenTypes;
+  NonFungibleKey: string;
+  Owner: string | null;
+  Address: string | null;
+  Currency: string | null;
+  Icon: string | null;
+  Image: string | null;
+  Custom1: string | null;
+  Custom2: string | null;
+  Custom3: string | null;
+
+  constructor(blockData: string | undefined) {
+    super(blockData);
+    if (blockData === undefined) {
+    } else {
+      throw new Error("Should not be called with blockData");
+    }
+  }
+
+  GetBlockType(): BlockTypes {
+    return BlockTypes.TokenGenesis;
+  }
+
+  toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
+    // setup service block related fields
+    this.Fee = sb.TokenGenerationFee;
+    this.FeeType = AuthorizationFeeTypes.Regular;
+    return super.toJson(wallet, sb);
   }
 }

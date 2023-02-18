@@ -38,6 +38,8 @@ export class LyraApi {
       var ret = await nodeApi.GetLastBlock(this.accountId);
       var lsb = await nodeApi.lastServiceHash();
 
+      const block = JSON.parse(ret.data.blockData);
+
       var sendBlock = new SendTransferBlock(ret.data.blockData);
       sendBlock.Balances[token] -= amount * 600000000;
       sendBlock.ServiceHash = lsb.data;

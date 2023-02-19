@@ -1,3 +1,4 @@
+import { UniOrder, UniTrade } from "./blocks/block";
 import { APIResult, AuthorizationAPIResult, ContractTypes, HoldTypes, LyraContractABI } from "./blocks/meta";
 export declare class LyraApi {
     private network;
@@ -30,4 +31,8 @@ export declare class LyraApi {
     serviceRequestAsync(arg: LyraContractABI): Promise<AuthorizationAPIResult>;
     createFiatWalletAsync(symbol: string): Promise<APIResult>;
     printFiat(symbol: string, count: number): Promise<APIResult>;
+    createUniOrder(order: UniOrder): Promise<AuthorizationAPIResult>;
+    createUniTrade(trade: UniTrade): Promise<AuthorizationAPIResult>;
+    DelistUniOrder(daoId: string, orderId: string): Promise<AuthorizationAPIResult>;
+    CloseUniOrder(daoId: string, orderId: string): Promise<AuthorizationAPIResult>;
 }

@@ -1,6 +1,6 @@
 {
   "name": "lyra-crypto",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",
@@ -10,6 +10,7 @@
   "devDependencies": {
     "@tsconfig/node14": "^1.0.3",
     "@types/jest": "^29.2.5",
+    "@types/json-stable-stringify": "^1.0.34",
     "@types/jsrsasign": "^10.5.4",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.48.0",

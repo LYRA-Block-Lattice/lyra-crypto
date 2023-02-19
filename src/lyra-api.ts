@@ -6,17 +6,22 @@ import {
   OpenWithReceiveTransferBlock,
   ReceiveTransferBlock,
   SendTransferBlock,
-  TokenGenesisBlock
+  TokenGenesisBlock,
+  UniOrder,
+  UniTrade
 } from "./blocks/block";
 import {
+  Amounts,
   APIResult,
   AuthorizationAPIResult,
   BrokerActions,
   ContractTypes,
   HoldTypes,
   LyraContractABI,
-  NonFungibleTokenTypes
+  NonFungibleTokenTypes,
+  Tags
 } from "./blocks/meta";
+import stringify from "json-stable-stringify";
 
 import { LyraCrypto } from "./lyra-crypto";
 import * as nodeApi from "./node-api";
@@ -279,6 +284,7 @@ export class LyraApi {
       gensBlock.Custom2 = metadataUri;
       gensBlock.Custom3 = null;
       gensBlock.Tags = null;
+      gensBlock.SourceHash = null;
 
       gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
 
@@ -346,6 +352,7 @@ export class LyraApi {
       gensBlock.Custom2 = metadataUri;
       gensBlock.Custom3 = descSignature;
       gensBlock.Tags = null;
+      gensBlock.SourceHash = null;
 
       gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
 
@@ -418,5 +425,85 @@ export class LyraApi {
 
     const result2 = await this.serviceRequestAsync(printMoney);
     return result2;
+  }
+
+  async createUniOrder(order: UniOrder): Promise<AuthorizationAPIResult> {
+    let tags: Tags = {
+      [LyraGlobal.REQSERVICETAG]: BrokerActions.BRK_UNI_CRODR,
+      data: stringify(order)
+    };
+
+    let amounts: Amounts = {};
+    if (order.offering == LyraGlobal.OFFICIALTICKERCODE) {
+      //amounts.set(order.offering, amounts.get(order.offering) + order.amount);
+      amounts = {
+        [LyraGlobal.OFFICIALTICKERCODE]:
+          order.amount + LyraGlobal.GetListingFeeFor() + order.cltamt
+      };
+    } else {
+      //amounts.set(order.offering, order.amount);
+      amounts = {
+        [LyraGlobal.OFFICIALTICKERCODE]:
+          LyraGlobal.GetListingFeeFor() + order.cltamt,
+        [order.offering]: order.amount
+      };
+    }
+    return await this.sendEx(order.daoId, amounts, tags);
+  }
+
+  async createUniTrade(trade: UniTrade): Promise<AuthorizationAPIResult> {
+    let tags: Tags = {
+      [LyraGlobal.REQSERVICETAG]: BrokerActions.BRK_UNI_CRTRD,
+      data: stringify(trade)
+    };
+
+    let amounts: Amounts = {};
+    if (trade.biding == LyraGlobal.OFFICIALTICKERCODE) {
+      //amounts.set(order.offering, amounts.get(order.offering) + order.amount);
+      amounts = {
+        [LyraGlobal.OFFICIALTICKERCODE]: trade.pay + trade.cltamt
+      };
+    } else {
+      //amounts.set(order.offering, order.amount);
+      amounts = {
+        [LyraGlobal.OFFICIALTICKERCODE]: trade.cltamt,
+        [trade.biding]: trade.pay
+      };
+    }
+    return await this.sendEx(trade.daoId, amounts, tags);
+  }
+
+  async DelistUniOrder(
+    daoId: string,
+    orderId: string
+  ): Promise<AuthorizationAPIResult> {
+    let tags: Tags = {
+      [LyraGlobal.REQSERVICETAG]: BrokerActions.BRK_UNI_ORDDELST,
+      daoid: daoId,
+      orderid: orderId
+    };
+
+    let amounts: Amounts = {
+      [LyraGlobal.OFFICIALTICKERCODE]: 1
+    };
+
+    return await this.sendEx(daoId, amounts, tags);
+  }
+
+  async CloseUniOrder(
+    daoId: string,
+    orderId: string
+  ): Promise<AuthorizationAPIResult> {
+    let tags: Tags = {
+      [LyraGlobal.REQSERVICETAG]: BrokerActions.BRK_UNI_ORDCLOSE,
+      daoid: daoId,
+      orderid: orderId
+    };
+
+    let amounts: Amounts = {
+      [LyraGlobal.OFFICIALTICKERCODE]: 1
+    };
+
+    return await this.sendEx(daoId, amounts, tags);
   }
 }

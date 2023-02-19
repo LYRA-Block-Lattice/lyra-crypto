@@ -5,9 +5,10 @@ import {
   AuthorizationFeeTypes,
   BlockTypes,
   ContractTypes,
-  NonFungibleTokenTypes
+  NonFungibleTokenTypes,
+  HoldTypes
 } from "./meta";
-const stringify = require("json-stable-stringify");
+import stringify from "json-stable-stringify";
 
 export class LyraGlobal {
   static readonly DatabaseVersion = 11;
@@ -17,6 +18,8 @@ export class LyraGlobal {
   static readonly OFFICIALTICKERCODE = "LYR";
   static readonly GUILDACCOUNTID =
     "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
+
+  static GetListingFeeFor = () => 10;
 }
 
 export class Block {
@@ -259,5 +262,75 @@ export class TokenGenesisBlock extends ReceiveTransferBlock {
     this.Balances[sb.FeeTicker] -=
       sb.TokenGenerationFee * LyraGlobal.BALANCERATIO;
     return super.toJson(wallet, sb);
+  }
+}
+
+export class UniOrder {
+  daoId!: string;
+  dealerId!: string;
+  offerby!: HoldTypes;
+  offering!: string;
+  bidby!: HoldTypes;
+  biding!: string;
+  price!: number;
+  eqprice!: number;
+  amount!: number;
+  limitMin!: number;
+  limitMax!: number;
+  payBy!: string[];
+  cltamt!: number;
+}
+
+export class UniTrade {
+  public daoId: string;
+  public dealerId: string;
+  public orderId: string;
+  public orderOwnerId: string;
+
+  public offby: HoldTypes;
+  public offering: string;
+
+  public bidby: HoldTypes;
+  public biding: string;
+
+  public price: number;
+  public eqprice: number;
+
+  public amount: number;
+  public cltamt: number;
+
+  public pay: number;
+  public payVia: string;
+
+  constructor(
+    daoId: string,
+    dealerId: string,
+    orderId: string,
+    orderOwnerId: string,
+    offby: HoldTypes,
+    offering: string,
+    bidby: HoldTypes,
+    biding: string,
+    price: number,
+    eqprice: number,
+    amount: number,
+    cltamt: number,
+    pay: number,
+    payVia: string
+  ) {
+    this.daoId = daoId;
+    this.dealerId = dealerId;
+    this.orderId = orderId;
+    this.orderOwnerId = orderOwnerId;
+    this.offby = offby;
+    this.offering = offering;
+    this.bidby = bidby;
+    this.biding = biding;
+    this.price = price;
+    this.eqprice = eqprice;
+    this.amount = amount;
+    this.cltamt = cltamt;
+    this.pay = pay;
+    this.payVia = payVia;
   }
 }

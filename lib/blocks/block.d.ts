@@ -1,5 +1,5 @@
 import { LyraApi } from "../lyra-api";
-import { AccountTypes, AuthorizationFeeTypes, BlockTypes, ContractTypes, NonFungibleTokenTypes } from "./meta";
+import { AccountTypes, AuthorizationFeeTypes, BlockTypes, ContractTypes, NonFungibleTokenTypes, HoldTypes } from "./meta";
 export declare class LyraGlobal {
     static readonly DatabaseVersion = 11;
     static readonly BALANCERATIO = 100000000;
@@ -7,6 +7,7 @@ export declare class LyraGlobal {
     static readonly MANAGEDTAG = "managed";
     static readonly OFFICIALTICKERCODE = "LYR";
     static readonly GUILDACCOUNTID = "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
+    static GetListingFeeFor: () => number;
 }
 export declare class Block {
     Height: number;
@@ -92,4 +93,36 @@ export declare class TokenGenesisBlock extends ReceiveTransferBlock {
     constructor(blockData: string | undefined);
     GetBlockType(): BlockTypes;
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
+}
+export declare class UniOrder {
+    daoId: string;
+    dealerId: string;
+    offerby: HoldTypes;
+    offering: string;
+    bidby: HoldTypes;
+    biding: string;
+    price: number;
+    eqprice: number;
+    amount: number;
+    limitMin: number;
+    limitMax: number;
+    payBy: string[];
+    cltamt: number;
+}
+export declare class UniTrade {
+    daoId: string;
+    dealerId: string;
+    orderId: string;
+    orderOwnerId: string;
+    offby: HoldTypes;
+    offering: string;
+    bidby: HoldTypes;
+    biding: string;
+    price: number;
+    eqprice: number;
+    amount: number;
+    cltamt: number;
+    pay: number;
+    payVia: string;
+    constructor(daoId: string, dealerId: string, orderId: string, orderOwnerId: string, offby: HoldTypes, offering: string, bidby: HoldTypes, biding: string, price: number, eqprice: number, amount: number, cltamt: number, pay: number, payVia: string);
 }

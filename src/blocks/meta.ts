@@ -1,3 +1,11 @@
+export interface Amounts {
+  [key: string]: number;
+}
+
+export interface Tags {
+  [key: string]: string;
+}
+
 export enum AccountTypes {
   Standard = 1,
   Savings = 2,

@@ -1,5 +1,5 @@
-import { RequestOptions } from "http";
 import { AuthorizationAPIResult, BlockAPIResult } from "./blocks/meta";
+import ky from "ky-universal";
 
 export class BlockchainAPI {
   static networkid: string = "devnet";
@@ -33,11 +33,8 @@ export class BlockchainAPI {
     url: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const response = await fetch(url, options);
+    const response = await ky.get(url, options);
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message);
-    }
     return data as T;
   }
 
@@ -46,7 +43,7 @@ export class BlockchainAPI {
     json: string,
     options?: RequestInit
   ): Promise<T> {
-    const response = await fetch(url, {
+    const response = await ky.post(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,10 +52,6 @@ export class BlockchainAPI {
       body: json,
       ...options
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-    }
 
     return response.json() as Promise<T>;
   }

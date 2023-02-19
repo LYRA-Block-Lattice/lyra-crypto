@@ -237,10 +237,357 @@ export enum HoldTypes {
   SVC
 }
 
+export enum APIResultCodes {
+  Success = 0,
+  UnknownError = 1,
+  // default error code
+  UndefinedError = 1000,
+  BlockWithThisIndexAlreadyExists = 2,
+  AccountAlreadyExists = 3,
+  AccountDoesNotExist = 4,
+  BlockWithThisPreviousHashAlreadyExists = 5, // double-spending attempt - trying to add another block to the same previous block
+  BlockValidationFailed = 6,
+  TokenGenesisBlockAlreadyExists = 7,
+  CouldNotFindLatestBlock = 8,
+  NegativeTransactionAmount = 9,
+  AccountChainBlockValidationFailed = 10,
+  AccountChainSignatureValidationFailed = 11,
+  AccountChainBalanceValidationFailed = 12,
+  AccountBlockAlreadyExists = 13,
+  SourceSendBlockNotFound = 14,
+  InvalidDestinationAccountId = 15,
+  CouldNotTraceSendBlockChain = 16,
+  TransactionAmountDoesNotMatch = 17,
+  ExceptionInOpenAccountWithGenesis = 18,
+  ExceptionInSendTransfer = 19,
+  ExceptionInReceiveTransferAndOpenAccount = 20,
+  ExceptionInReceiveTransfer = 21,
+  InvalidBlockType = 22,
+  ExceptionInCreateToken = 23,
+  InvalidFeeAmount = 24,
+  InvalidNewAccountBalance = 25,
+  SendTransactionValidationFailed = 26,
+  ReceiveTransactionValidationFailed = 27,
+  TransactionTokenDoesNotMatch = 28,
+  BlockSignatureValidationFailed = 29,
+  NoNewTransferFound = 30,
+  TokenGenesisBlockNotFound = 31,
+  ServiceBlockNotFound = 32,
+  BlockNotFound = 33,
+  NoRPCServerConnection = 34,
+  ExceptionInNodeAPI = 35,
+  ExceptionInWebAPI = 36,
+  PreviousBlockNotFound = 37,
+  InsufficientFunds = 38,
+  InvalidAccountId = 39,
+  InvalidPrivateKey = 40,
+  TradeOrderMatchFound = 41,
+  InvalidIndexSequence = 42,
+  FeatureIsNotSupported = 48,
+
+  // Trade Codes
+
+  ExceptionInTradeOrderAuthorizer = 43,
+  ExceptionInTradeAuthorizer = 44,
+  ExceptionInExecuteTradeOrderAuthorizer = 45,
+  ExceptionInCancelTradeOrderAuthorizer = 46,
+
+  TradeOrderValidationFailed = 47,
+  NoTradesFound = 49,
+  TradeOrderNotFound = 50,
+  InvalidTradeAmount = 51,
+
+  // Non-fungible token codes
+  InvalidNonFungibleAmount = 52,
+  InvalidNonFungibleTokenCode = 53,
+  MissingNonFungibleToken = 54,
+  InvalidNonFungibleSenderAccountId = 55,
+  NoNonFungibleTokensFound = 56,
+  OriginNonFungibleBlockNotFound = 57,
+  SourceNonFungibleBlockNotFound = 58,
+  OriginNonFungibleBlockHashDoesNotMatch = 59,
+  SourceNonFungibleBlockHashDoesNotMatch = 60,
+  NonFungibleSignatureVerificationFailed = 61,
+  InvalidNonFungiblePublicKey = 62,
+
+  InvalidNFT = 6200,
+  InvalidCollectibleNFT = 6201,
+  DuplicateNFTCollectibleSerialNumber = 6202,
+  NFTCollectibleSerialNumberDoesNotExist = 6203,
+  InvalidCollectibleNFTDenomination = 6204,
+  InvalidCollectibleNFTSerialNumber = 6205,
+  NFTInstanceNotFound = 6206,
+  NFTSignaturesDontMatch = 6207,
+
+  ТlockHashDoesNotMatch = 59,
+
+  CancelTradeOrderValidationFailed = 63,
+
+  InvalidFeeType = 64,
+
+  InvalidParameterFormat = 65,
+
+  APISignatureValidationFailed = 66,
+
+  InvalidNetworkId = 67,
+  CannotSendToSelf = 68,
+  InvalidAmountToSend = 69,
+
+  InvalidPreviousBlock,
+
+  CannotModifyImportedAccount,
+  AccountAlreadyImported,
+  CannotImportEmptyAccount,
+  CannotImportAccountWithOtherImports,
+  ImportTransactionValidationFailed,
+  CannotImportAccountToItself,
+
+  // service blocks related
+  InvalidConsolidationMerkleTreeHash = 80,
+  InvalidConsolidationTotalFees,
+  InvalidConsolidationMissingBlocks,
+  InvalidServiceBlockTotalFees,
+  InvalidFeeTicker,
+  InvalidAuthorizerCount,
+  InvalidAuthorizerInServiceBlock,
+  InvalidLeaderInServiceBlock,
+  InvalidLeaderInConsolidationBlock,
+  InvalidConsolidationBlockContinuty,
+  InvalidConsolidationBlockCount,
+  InvalidConsolidationBlockHashes,
+
+  InvalidSyncFeeBlock,
+
+  DuplicateReceiveBlock = 100,
+
+  InvalidTokenRenewalDate = 200,
+
+  TokenExpired = 201,
+
+  NameUnavailable = 202,
+  DomainNameTooShort,
+  EmptyDomainName,
+  DomainNameReserved,
+
+  NotAllowedToSign = 300,
+  NotAllowedToCommit = 301,
+  BlockFailedToBeAuthorized = 302,
+  NodeOutOfSync = 303,
+  PBFTNetworkNotReadyForConsensus = 304,
+  DoubleSpentDetected = 305,
+  NotListedAsQualifiedAuthorizer = 306,
+  ConsensusTimeout = 307,
+  SystemNotReadyToServe,
+  InvalidBlockTimeStamp,
+
+  FailedToSyncAccount,
+  APIRouteFailed,
+  InvalidDomainName,
+  InvalidTickerName,
+  InvalidAuthorizerSignatureInServiceBlock,
+
+  InvalidTokenPair = 330,
+  PoolAlreadyExists,
+  PoolNotExists,
+  PoolShareNotExists,
+  InvalidPoolOperation,
+  PoolOperationAlreadyCompleted,
+  InvalidPoolDepositionAmount,
+  InvalidPoolDepositionRito,
+  InvalidPoolWithdrawAccountId,
+  InvalidPoolWithdrawAmount,
+  InvalidPoolWithdrawRito,
+  InvalidTokenToSwap,
+  TooManyTokensToSwap,
+  InvalidPoolSwapOutToken,
+  InvalidPoolSwapOutAmount,
+  InvalidPoolSwapOutShare,
+  InvalidPoolSwapOutAccountId,
+  PoolSwapRitoChanged,
+  InvalidSwapSlippage,
+  SwapSlippageExcceeded,
+  PoolOutOfLiquidaty,
+  RequotaNeeded, // pool or target account is busy
+  InvalidBlockTags,
+  InvalidProfitingAccount,
+  VotingDaysTooSmall,
+  InvalidShareOfProfit,
+  DuplicateName,
+  InvalidStakingAccount,
+  SystemBusy,
+  InvalidName,
+  InvalidRelatedTx,
+  InvalidTimeRange,
+  InvalidShareRitio,
+  InvalidSeatsCount,
+  InvalidMessengerAccount,
+  RequestNotPermited,
+  DuplicateAccountType,
+  InvalidManagementBlock,
+  InvalidBrokerAcount,
+  InvalidUnstaking,
+  InvalidBalance,
+  InvalidOpeningAccount,
+  InvalidBlockSequence,
+  InvalidManagedTransaction,
+  ProfitUnavaliable,
+  BlockCompareFailed,
+  InvalidAmount,
+
+  InvalidBlockData = 400,
+  AccountLockDown,
+  UnsupportedBlockType,
+
+  UnsuppportedServiceRequest = 500,
+  InvalidServiceRequest = 501,
+  Unsupported,
+
+  InvalidExternalToken,
+  InvalidTokenMint,
+  InvalidTokenBurn,
+  InvalidWithdrawToAddress,
+  InvalidAccountType,
+  UnsupportedDexToken,
+  InvalidDexServer,
+  InvalidExternalAddress,
+  TokenNotFound,
+
+  InvalidOrgnization,
+  InvalidOrder,
+  InvalidTrade,
+  NotOwnerOfTrade,
+  NotSellerOfTrade,
+  InvalidTradeStatus,
+  InvalidOrderStatus,
+  InvalidCollateral,
+  InputTooLong,
+  Exception,
+  StorageAPIFailure,
+
+  DealerRoomNotExists,
+  NotFound,
+  InvalidTagParameters,
+  InputTooShort,
+  CollateralNotEnough,
+
+  InvalidVote,
+  InvalidArgument,
+  Unauthorized,
+  InvalidDAO,
+  NotEnoughVoters,
+  InvalidDataType,
+  NotImplemented,
+  InvalidOperation,
+  AlreadyExecuted,
+  InvalidToken,
+  ResourceIsBusy,
+  TradesPending,
+  ArgumentOutOfRange,
+  PriceChanged,
+  InvalidDecimalDigitalCount,
+  InvalidDealerServer,
+  NotOwnerOfOrder,
+  NotRegisteredToDealer,
+  ResolutionPending,
+  DisputeLevelWasRaised,
+  PermissionDenied,
+  DisputeCaseWasNotIncluded,
+  InvalidVerificationCode,
+  InvalidMetadataUri,
+  APIIsObsolete,
+  TotTransferNotAllowed,
+  InvalidProofOfDelivery,
+  InvalidFeeRito,
+  InvalidPrice,
+  DuplicateBlock
+}
+
 export class APIResult {
-  public ResultCode: APIResultCodes;
-  public ResultMessage: string;
+  public resultCode: APIResultCodes;
+  public resultMessage: string;
 }
 export class AuthorizationAPIResult extends APIResult {
-  public TxHash: string;
+  public txHash: string;
+}
+
+export class LyraContractABI {
+  svcReq: string;
+  targetAccountId: string;
+  amounts: { [key: string]: number };
+  objArgument: any;
+}
+
+export class BrokerActions {
+  public static readonly BRK_POOL_CRPL = "CRPL";
+  public static readonly BRK_POOL_ADDLQ = "ADDLQ";
+  public static readonly BRK_POOL_RMLQ = "RMLQ";
+  public static readonly BRK_POOL_SWAP = "SWAP";
+
+  public static readonly BRK_STK_CRSTK = "CRSTK";
+  public static readonly BRK_STK_ADDSTK = "ADDSTK";
+  public static readonly BRK_STK_UNSTK = "UNSTK";
+
+  public static readonly BRK_PFT_CRPFT = "CRPFT";
+  //public static readonly BRK_PFT_FEEPFT = "FEEPFT";    // combine to getpft
+  public static readonly BRK_PFT_GETPFT = "GETPFT";
+
+  //public static readonly BRK_MCT_CRMCT = "CRMCT";
+  //public static readonly BRK_MCT_PAYMCT = "PAYMCT";
+  //public static readonly BRK_MCT_UNPAY = "UNPAY";
+  //public static readonly BRK_MCT_CFPAY = "CFPAY";
+  //public static readonly BRK_MCT_GETPAY = "GETPAY";
+
+  // DEX
+  public static readonly BRK_DEX_DPOREQ = "DPOREQ";
+  public static readonly BRK_DEX_MINT = "MINT";
+  public static readonly BRK_DEX_GETTKN = "GETTKN";
+  public static readonly BRK_DEX_PUTTKN = "PUTTKN";
+  public static readonly BRK_DEX_WDWREQ = "WDWREQ";
+
+  // Fiat
+  public static readonly BRK_FIAT_CRACT = "FATCRACT";
+  public static readonly BRK_FIAT_PRINT = "FATPRNT";
+  public static readonly BRK_FIAT_GET = "FATGET";
+
+  // DAO
+  public static readonly BRK_DAO_CRDAO = "CRDAO";
+  public static readonly BRK_DAO_JOIN = "JOINDAO";
+  public static readonly BRK_DAO_LEAVE = "LEAVEDAO";
+  public static readonly BRK_DAO_CHANGE = "CHANGEDAO";
+  public static readonly BRK_DAO_VOTED_CHANGE = "VTCHGDAO";
+
+  // OTC
+  public static readonly BRK_OTC_CRODR = "CRODR";
+  public static readonly BRK_OTC_CRTRD = "CRTRD";
+  public static readonly BRK_OTC_TRDPAYSENT = "TRDPAYSNT";
+  public static readonly BRK_OTC_TRDPAYGOT = "TRDPAYGOT";
+  public static readonly BRK_OTC_ORDDELST = "ORDDELST";
+  public static readonly BRK_OTC_ORDCLOSE = "ORDCLOSE";
+  public static readonly BRK_OTC_TRDCANCEL = "TRDCANCEL";
+
+  // OTC Dispute
+  public static readonly BRK_OTC_CRDPT = "ORDCRDPT";
+  public static readonly BRK_OTC_RSLDPT = "ORDRSLDPT";
+
+  // Voting
+  public static readonly BRK_VOT_CREATE = "CRVOTS";
+  public static readonly BRK_VOT_VOTE = "VOTE";
+  public static readonly BRK_VOT_CLOSE = "VOTCLS";
+
+  // Dealer
+  public static readonly BRK_DLR_CREATE = "DLRCRT";
+  public static readonly BRK_DLR_UPDATE = "DLRUPD";
+
+  // Universal Order/Trade
+  public static readonly BRK_UNI_CRODR = "UCRODR";
+  public static readonly BRK_UNI_CRTRD = "UCRTRD";
+  public static readonly BRK_UNI_TRDPAYSENT = "UTRDPAYSNT";
+  public static readonly BRK_UNI_TRDPAYGOT = "UTRDPAYGOT";
+  public static readonly BRK_UNI_ORDDELST = "UORDDELST";
+  public static readonly BRK_UNI_ORDCLOSE = "UORDCLOSE";
+  public static readonly BRK_UNI_TRDCANCEL = "UTRDCANCEL";
+
+  // Universal Dispute
+  public static readonly BRK_UNI_CRDPT = "UORDCRDPT";
+  public static readonly BRK_UNI_RSLDPT = "UORDRSLDPT";
 }

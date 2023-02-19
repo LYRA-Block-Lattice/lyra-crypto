@@ -9,9 +9,12 @@ import {
   TokenGenesisBlock
 } from "./blocks/block";
 import {
+  APIResult,
   AuthorizationAPIResult,
+  BrokerActions,
   ContractTypes,
   HoldTypes,
+  LyraContractABI,
   NonFungibleTokenTypes
 } from "./blocks/meta";
 
@@ -47,20 +50,27 @@ export class LyraApi {
     return LyraCrypto.Sign(data, this.prvKey);
   }
 
-  async send(amount: number, destAddr: string, token: string) {
+  async sendEx(
+    destinationAccountId: string,
+    amounts: { [key: string]: number },
+    tags: { [key: string]: string } | null
+  ): Promise<AuthorizationAPIResult> {
+    // function body
     try {
       var ret = await nodeApi.GetLastBlock(this.accountId);
+      if (ret.data.resultCode != 0) {
+        throw new Error("GetLastBlock failed: " + ret.data.resultCode);
+      }
       var lsb = await nodeApi.getLastServiceBlock();
       var sb = JSON.parse(lsb.data.blockData);
 
       var sendBlock = new SendTransferBlock(ret.data.blockData);
-      console.log(
-        `Current balance is: ${
-          sendBlock.Balances[token] / LyraGlobal.BALANCERATIO
-        }`
-      );
-      sendBlock.Balances[token] -= amount * LyraGlobal.BALANCERATIO;
-      sendBlock.DestinationAccountId = destAddr;
+      const amountsArray: [string, number][] = Object.entries(amounts);
+      amountsArray.forEach(([key, value]) => {
+        sendBlock.Balances[key] -= value * LyraGlobal.BALANCERATIO;
+      });
+      sendBlock.DestinationAccountId = destinationAccountId;
+      sendBlock.Tags = tags;
 
       const finalJson = sendBlock.toJson(this, sb);
       //console.log("sendBlock", finalJson);
@@ -72,6 +82,10 @@ export class LyraApi {
       console.log("send error", error);
       throw error;
     }
+  }
+
+  async send(amount: number, destAddr: string, token: string) {
+    return await this.sendEx(destAddr, { [token]: amount }, null);
   }
 
   async receive() {
@@ -211,6 +225,7 @@ export class LyraApi {
       gensBlock.Custom2 = null;
       gensBlock.Custom3 = null;
       gensBlock.Tags = tags;
+      gensBlock.SourceHash = null;
 
       gensBlock.Balances[ticker] = supply * LyraGlobal.BALANCERATIO;
 
@@ -344,5 +359,64 @@ export class LyraApi {
       console.log("mintToken error", error);
       throw error;
     }
+  }
+
+  async serviceRequestAsync(
+    arg: LyraContractABI
+  ): Promise<AuthorizationAPIResult> {
+    const tags: { [key: string]: string } = {
+      [LyraGlobal.REQSERVICETAG]: arg.svcReq,
+      objType: arg.objArgument.constructor.name,
+      data: JSON.stringify(arg.objArgument)
+    };
+
+    const result = await this.sendEx(arg.targetAccountId, arg.amounts, tags);
+    return result;
+  }
+
+  async createFiatWalletAsync(symbol: string): Promise<APIResult> {
+    const existsWalletRet = await nodeApi.findFiatWallet(
+      this.accountId,
+      symbol
+    );
+    if (existsWalletRet.data.resultCode != 0) {
+      const crwlt: LyraContractABI = {
+        svcReq: BrokerActions.BRK_FIAT_CRACT,
+        targetAccountId: LyraGlobal.GUILDACCOUNTID,
+        amounts: {
+          [LyraGlobal.OFFICIALTICKERCODE]: 1
+        },
+        objArgument: {
+          symbol: symbol
+        }
+      };
+
+      const result = await this.serviceRequestAsync(crwlt);
+      return result;
+    }
+
+    return existsWalletRet.data;
+  }
+
+  async printFiat(symbol: string, count: number): Promise<APIResult> {
+    const existsWalletRet = await nodeApi.findFiatWallet(
+      this.accountId,
+      symbol
+    );
+
+    const printMoney: LyraContractABI = {
+      svcReq: BrokerActions.BRK_FIAT_PRINT,
+      targetAccountId: LyraGlobal.GUILDACCOUNTID,
+      amounts: {
+        [LyraGlobal.OFFICIALTICKERCODE]: 1
+      },
+      objArgument: {
+        symbol: symbol,
+        amount: count
+      }
+    };
+
+    const result2 = await this.serviceRequestAsync(printMoney);
+    return result2;
   }
 }

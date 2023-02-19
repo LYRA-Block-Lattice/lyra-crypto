@@ -1,4 +1,4 @@
-import { ContractTypes } from "./blocks/meta";
+import { APIResult, AuthorizationAPIResult, ContractTypes, HoldTypes, LyraContractABI } from "./blocks/meta";
 export declare class LyraApi {
     private network;
     private nodeAddress?;
@@ -7,7 +7,12 @@ export declare class LyraApi {
     constructor(network: string, privateKey: string, node?: string);
     init(): void;
     sign(data: string): string;
-    send(amount: number, destAddr: string, token: string): Promise<any>;
+    sendEx(destinationAccountId: string, amounts: {
+        [key: string]: number;
+    }, tags: {
+        [key: string]: string;
+    } | null): Promise<AuthorizationAPIResult>;
+    send(amount: number, destAddr: string, token: string): Promise<AuthorizationAPIResult>;
     receive(): Promise<any>;
     balance(): Promise<{
         data: any;
@@ -15,9 +20,14 @@ export declare class LyraApi {
     } | undefined>;
     history(start: Date, end: Date, count: number): Promise<any>;
     close(): void;
-    mintToken(tokenName: string, domainName: string, description: string, precision: number, supply: number, isFinalSupply: boolean, owner: string, // shop name
-    address: string, // shop URL
-    currency: string, // USD
+    mintToken(tokenName: string, domainName: string, description: string, precision: number, supply: number, isFinalSupply: boolean, owner: string | null, // shop name
+    address: string | null, // shop URL
+    currency: string | null, // USD
     contractType: ContractTypes, // reward or discount or custom
-    tags: Record<string, string>): Promise<any>;
+    tags: Record<string, string> | null): Promise<any>;
+    mintNFT(name: string, description: string, supply: number, metadataUri: string, owner: string | null): Promise<any>;
+    createTOT(type: HoldTypes, name: string, description: string, supply: number, metadataUri: string, descSignature: string, owner: string | null): Promise<AuthorizationAPIResult>;
+    serviceRequestAsync(arg: LyraContractABI): Promise<AuthorizationAPIResult>;
+    createFiatWalletAsync(symbol: string): Promise<APIResult>;
+    printFiat(symbol: string, count: number): Promise<APIResult>;
 }

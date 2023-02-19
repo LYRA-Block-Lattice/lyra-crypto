@@ -12,6 +12,11 @@ const stringify = require("json-stable-stringify");
 export class LyraGlobal {
   static readonly DatabaseVersion = 11;
   static readonly BALANCERATIO = 100000000;
+  static readonly REQSERVICETAG = "svcreq";
+  static readonly MANAGEDTAG = "managed";
+  static readonly OFFICIALTICKERCODE = "LYR";
+  static readonly GUILDACCOUNTID =
+    "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
 }
 
 export class Block {
@@ -168,15 +173,10 @@ export class SendTransferBlock extends TransactionBlock {
 }
 
 export class ReceiveTransferBlock extends TransactionBlock {
-  SourceHash: string;
+  SourceHash: string | null;
 
   constructor(blockData: string | undefined) {
     super(blockData);
-    if (blockData === undefined) {
-    } else {
-      const decodedBlockData = JSON.parse(blockData);
-      this.SourceHash = decodedBlockData.SourceHash;
-    }
   }
 
   GetBlockType(): BlockTypes {
@@ -185,8 +185,10 @@ export class ReceiveTransferBlock extends TransactionBlock {
 
   toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
     // setup service block related fields
-    this.Fee = 0;
-    this.FeeType = AuthorizationFeeTypes.NoFee;
+    if (this.BlockType == BlockTypes.ReceiveTransfer) {
+      this.Fee = 0;
+      this.FeeType = AuthorizationFeeTypes.NoFee;
+    }
     return super.toJson(wallet, sb);
   }
 }
@@ -251,8 +253,11 @@ export class TokenGenesisBlock extends ReceiveTransferBlock {
 
   toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
     // setup service block related fields
+    //console.log("sb: ", sb);
     this.Fee = sb.TokenGenerationFee;
     this.FeeType = AuthorizationFeeTypes.Regular;
+    this.Balances[sb.FeeTicker] -=
+      sb.TokenGenerationFee * LyraGlobal.BALANCERATIO;
     return super.toJson(wallet, sb);
   }
 }

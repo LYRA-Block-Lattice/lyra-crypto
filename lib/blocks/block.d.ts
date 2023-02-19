@@ -3,6 +3,10 @@ import { AccountTypes, AuthorizationFeeTypes, BlockTypes, ContractTypes, NonFung
 export declare class LyraGlobal {
     static readonly DatabaseVersion = 11;
     static readonly BALANCERATIO = 100000000;
+    static readonly REQSERVICETAG = "svcreq";
+    static readonly MANAGEDTAG = "managed";
+    static readonly OFFICIALTICKERCODE = "LYR";
+    static readonly GUILDACCOUNTID = "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
 }
 export declare class Block {
     Height: number;
@@ -54,7 +58,7 @@ export declare class SendTransferBlock extends TransactionBlock {
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
 }
 export declare class ReceiveTransferBlock extends TransactionBlock {
-    SourceHash: string;
+    SourceHash: string | null;
     constructor(blockData: string | undefined);
     GetBlockType(): BlockTypes;
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;

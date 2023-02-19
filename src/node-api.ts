@@ -70,6 +70,9 @@ export const mintToken = (tokenBlock: string) =>
 export const getUnreceived = (accountId: string) =>
   Block_API_v1.get("/LookForNewTransfer2?AccountId=" + accountId);
 
+export const findFiatWallet = (owner: string, symbol: string) =>
+  Block_API_v1.get("/FindFiatWallet?owner=" + owner + "&symbol=" + symbol);
+
 export const getHistory = (
   accountId: string,
   start: Date,

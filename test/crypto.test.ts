@@ -86,6 +86,7 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(dstResult).toBeDefined();
 
     const result2 = await wallet.send(1, dst, "LYR");
+    //console.log("send result:", result2);
     expect(result2.resultCode).toBe(0);
     expect(result2.resultMessage).toBe("Success");
 
@@ -99,6 +100,9 @@ describe("Lyra Crypto Library Test", (): void => {
       true
     );
     const dstBalaceResult = await dstWallet.balance();
+    console.log(
+      `dst balance before ${dstResult?.balance["LYR"]} after: ${dstBalaceResult?.balance["LYR"]}`
+    );
     expect(
       dstBalaceResult?.balance["LYR"] - dstResult?.balance["LYR"]
     ).toBeGreaterThanOrEqual(1); // amount
@@ -110,6 +114,18 @@ describe("Lyra Crypto Library Test", (): void => {
     expect(hist).toBeDefined();
     console.log("hist is ", hist);
   });
+
+  function generateRandomString(length: number): string {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return result;
+  }
 
   it("wallet genesis and token mint", async () => {
     const keys = LyraCrypto.GenerateWallet();
@@ -124,8 +140,9 @@ describe("Lyra Crypto Library Test", (): void => {
     const balanceResult = await wallet.balance();
     expect(balanceResult?.balance["LYR"]).toBe(10100);
 
+    const ticker = "TEST-" + generateRandomString(4);
     const mintRet = await wallet.mintToken(
-      "TEST",
+      ticker,
       "jesttest",
       "Jest test",
       8,
@@ -137,9 +154,11 @@ describe("Lyra Crypto Library Test", (): void => {
       ContractTypes.Cryptocurrency,
       null
     );
+    console.log("Mint Token Result: ", mintRet);
     expect(mintRet.resultCode).toBe(0);
     const balanceResult2 = await wallet.balance();
-    expect(balanceResult2?.balance["jesttest/TEST"]).toBe(1000000);
+    //console.log("balanceResult2: ", balanceResult2);
+    expect(balanceResult2?.balance["jesttest/" + ticker]).toBe(1000000);
     // const pvk = "dkrwRdqNjEEshpLuEPPqc6zM1HM3nzGjsYts39zzA1iUypcpj";
     // const pvk2 = "Hc3XcZgZ1d2jRxhNojN1gnKHv5SBs15mR8K2SdkBbycrgAjPr";
     // const dst =

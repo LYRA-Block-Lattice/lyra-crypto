@@ -518,6 +518,11 @@ export class AuthorizationAPIResult extends APIResult {
   public txHash: string;
 }
 
+export class BlockAPIResult extends APIResult {
+  public blockData: string;
+  public ResultBlockType: BlockTypes;
+}
+
 export class LyraContractABI {
   svcReq: string;
   targetAccountId: string;

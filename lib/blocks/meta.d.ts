@@ -369,6 +369,10 @@ export declare class APIResult {
 export declare class AuthorizationAPIResult extends APIResult {
     txHash: string;
 }
+export declare class BlockAPIResult extends APIResult {
+    blockData: string;
+    ResultBlockType: BlockTypes;
+}
 export declare class LyraContractABI {
     svcReq: string;
     targetAccountId: string;

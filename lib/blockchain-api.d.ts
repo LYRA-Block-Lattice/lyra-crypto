@@ -1,0 +1,32 @@
+import { AuthorizationAPIResult, BlockAPIResult } from "./blocks/meta";
+export declare class BlockchainAPI {
+    static networkid: string;
+    static Block_API_v1: string;
+    static Block_API_v2: string;
+    static Dealer_API: string;
+    static Start_API: string;
+    static setNetworkId: (id: string) => void;
+    static getBlockExplorerUrl: (id: string) => string;
+    static fetchJson<T>(url: string, options?: RequestInit): Promise<T>;
+    static postJson<T>(url: string, json: string, options?: RequestInit): Promise<T>;
+    static getLastServiceBlock: () => Promise<BlockAPIResult>;
+    static sendTransfer: (sendBlock: string) => Promise<AuthorizationAPIResult>;
+    static recvTransfer: (receiveBlock: string) => Promise<AuthorizationAPIResult>;
+    static recvTransferWithOpenAccount: (openReceiveBlock: string) => Promise<AuthorizationAPIResult>;
+    static mintToken: (tokenBlock: string) => Promise<AuthorizationAPIResult>;
+    static getUnreceived: (accountId: string) => Promise<any>;
+    static findFiatWallet: (owner: string, symbol: string) => Promise<any>;
+    static getHistory: (accountId: string, start: Date, end: Date, count: number) => Promise<any>;
+    static searchDao: (q: string) => Promise<any>;
+    static GetLastBlock: (accountId: string) => Promise<BlockAPIResult>;
+    static getTradeForOrder: (orderId: string) => Promise<any>;
+    static lastServiceHash: () => Promise<any>;
+    static getBalance: (accountId: string) => Promise<any>;
+    static fetchOrders: (catalog: string | undefined) => Promise<any>;
+    static fetchOrderById: (orderId: string) => Promise<any>;
+    static fetchOrdersByOwner: (owner: string) => Promise<any>;
+    static fetchTradesByOwner: (owner: string) => Promise<any>;
+    static fetchDealer: () => Promise<any>;
+    static uploadFile: (formData: FormData) => Promise<any>;
+    static createNFTMeta: (accountId: string, signature: string, name: string, description: string, imgUrl: string) => void;
+}

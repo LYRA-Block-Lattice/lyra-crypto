@@ -24,7 +24,7 @@ import {
 import stringify from "json-stable-stringify";
 
 import { LyraCrypto } from "./lyra-crypto";
-import * as nodeApi from "./node-api";
+import { BlockchainAPI } from "./blockchain-api";
 
 export class LyraApi {
   private network: string;
@@ -62,14 +62,14 @@ export class LyraApi {
   ): Promise<AuthorizationAPIResult> {
     // function body
     try {
-      var ret = await nodeApi.GetLastBlock(this.accountId);
-      if (ret.data.resultCode != 0) {
-        throw new Error("GetLastBlock failed: " + ret.data.resultCode);
+      var ret = await BlockchainAPI.GetLastBlock(this.accountId);
+      if (ret.resultCode != 0) {
+        throw new Error("GetLastBlock failed: " + ret.resultCode);
       }
-      var lsb = await nodeApi.getLastServiceBlock();
-      var sb = JSON.parse(lsb.data.blockData);
+      var lsb = await BlockchainAPI.getLastServiceBlock();
+      var sb = JSON.parse(lsb.blockData);
 
-      var sendBlock = new SendTransferBlock(ret.data.blockData);
+      var sendBlock = new SendTransferBlock(ret.blockData);
       const amountsArray: [string, number][] = Object.entries(amounts);
       amountsArray.forEach(([key, value]) => {
         sendBlock.Balances[key] -= value * LyraGlobal.BALANCERATIO;
@@ -80,9 +80,9 @@ export class LyraApi {
       const finalJson = sendBlock.toJson(this, sb);
       //console.log("sendBlock", finalJson);
 
-      var sendRet = await nodeApi.sendTransfer(finalJson);
+      var sendRet = await BlockchainAPI.sendTransfer(finalJson);
       //console.log("sendRet", sendRet);
-      return sendRet.data;
+      return sendRet;
     } catch (error) {
       console.log("send error", error);
       throw error;
@@ -96,19 +96,19 @@ export class LyraApi {
   async receive() {
     while (true) {
       try {
-        var unrecv = await nodeApi.getUnreceived(this.accountId);
+        var unrecv = await BlockchainAPI.getUnreceived(this.accountId);
         //console.log("changes", unrecv.data);
 
-        if (unrecv.data.resultCode == 0) {
+        if (unrecv.resultCode == 0) {
           // success.
-          var lsb = await nodeApi.getLastServiceBlock();
-          var sb = JSON.parse(lsb.data.blockData);
+          var lsb = await BlockchainAPI.getLastServiceBlock();
+          var sb = JSON.parse(lsb.blockData);
 
-          var ret = await nodeApi.GetLastBlock(this.accountId);
+          var ret = await BlockchainAPI.GetLastBlock(this.accountId);
           //console.log("last block", ret.data);
           var receiveBlock =
-            ret.data.resultCode == 0
-              ? new ReceiveTransferBlock(ret.data.blockData)
+            ret.resultCode == 0
+              ? new ReceiveTransferBlock(ret.blockData)
               : new OpenWithReceiveTransferBlock(undefined);
 
           receiveBlock.SourceHash = unrecv.data.sourceHash;
@@ -128,14 +128,14 @@ export class LyraApi {
           const finalJson = receiveBlock.toJson(this, sb);
           console.log("receiveBlock", finalJson);
           const recvret =
-            ret.data.resultCode == 0
-              ? await nodeApi.recvTransfer(finalJson)
-              : await nodeApi.recvTransferWithOpenAccount(finalJson);
+            ret.resultCode == 0
+              ? await BlockchainAPI.recvTransfer(finalJson)
+              : await BlockchainAPI.recvTransferWithOpenAccount(finalJson);
 
-          if (recvret.data.resultCode == 0) {
+          if (recvret.resultCode == 0) {
             // continue to receive next block.
           } else {
-            return recvret.data;
+            return recvret;
           }
         } else {
           // no new unreceived block.
@@ -154,7 +154,7 @@ export class LyraApi {
 
   async balance() {
     try {
-      var ret = await nodeApi.getBalance(this.accountId);
+      var ret = await BlockchainAPI.getBalance(this.accountId);
 
       let dictionary = Object.assign(
         {},
@@ -173,7 +173,12 @@ export class LyraApi {
 
   async history(start: Date, end: Date, count: number) {
     try {
-      const hists = await nodeApi.getHistory(this.accountId, start, end, count);
+      const hists = await BlockchainAPI.getHistory(
+        this.accountId,
+        start,
+        end,
+        count
+      );
       return hists.data;
     } catch (error) {
       console.log("history error", error);
@@ -201,12 +206,12 @@ export class LyraApi {
     tags: Record<string, string> | null
   ) {
     try {
-      var ret = await nodeApi.GetLastBlock(this.accountId);
-      var lsb = await nodeApi.getLastServiceBlock();
-      var sb = JSON.parse(lsb.data.blockData);
+      var ret = await BlockchainAPI.GetLastBlock(this.accountId);
+      var lsb = await BlockchainAPI.getLastServiceBlock();
+      var sb = JSON.parse(lsb.blockData);
 
       const ticker = domainName + "/" + tokenName;
-      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+      var gensBlock = new TokenGenesisBlock(ret.blockData);
 
       gensBlock.Ticker = ticker;
       gensBlock.DomainName = domainName;
@@ -237,9 +242,9 @@ export class LyraApi {
       const finalJson = gensBlock.toJson(this, sb);
       console.log("sendBlock", finalJson);
 
-      var sendRet = await nodeApi.mintToken(finalJson);
+      var sendRet = await BlockchainAPI.mintToken(finalJson);
       //console.log("sendRet", sendRet);
-      return sendRet.data;
+      return sendRet;
     } catch (error) {
       console.log("mintToken error", error);
       throw error;
@@ -254,13 +259,13 @@ export class LyraApi {
     owner: string | null
   ) {
     try {
-      var ret = await nodeApi.GetLastBlock(this.accountId);
-      var lsb = await nodeApi.getLastServiceBlock();
-      var sb = JSON.parse(lsb.data.blockData);
+      var ret = await BlockchainAPI.GetLastBlock(this.accountId);
+      var lsb = await BlockchainAPI.getLastServiceBlock();
+      var sb = JSON.parse(lsb.blockData);
 
       const domainName = "nft";
       const ticker = domainName + "/" + uuidv4();
-      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+      var gensBlock = new TokenGenesisBlock(ret.blockData);
 
       gensBlock.Ticker = ticker;
       gensBlock.DomainName = domainName;
@@ -291,9 +296,9 @@ export class LyraApi {
       const finalJson = gensBlock.toJson(this, sb);
       console.log("sendBlock", finalJson);
 
-      var sendRet = await nodeApi.mintToken(finalJson);
+      var sendRet = await BlockchainAPI.mintToken(finalJson);
       //console.log("sendRet", sendRet);
-      return sendRet.data;
+      return sendRet;
     } catch (error) {
       console.log("mintToken error", error);
       throw error;
@@ -310,9 +315,9 @@ export class LyraApi {
     owner: string | null
   ): Promise<AuthorizationAPIResult> {
     try {
-      var ret = await nodeApi.GetLastBlock(this.accountId);
-      var lsb = await nodeApi.getLastServiceBlock();
-      var sb = JSON.parse(lsb.data.blockData);
+      var ret = await BlockchainAPI.GetLastBlock(this.accountId);
+      var lsb = await BlockchainAPI.getLastServiceBlock();
+      var sb = JSON.parse(lsb.blockData);
 
       const domainName = (() => {
         switch (type) {
@@ -328,7 +333,7 @@ export class LyraApi {
       })();
 
       const ticker = domainName + "/" + uuidv4();
-      var gensBlock = new TokenGenesisBlock(ret.data.blockData);
+      var gensBlock = new TokenGenesisBlock(ret.blockData);
 
       gensBlock.Ticker = ticker;
       gensBlock.DomainName = domainName;
@@ -359,9 +364,9 @@ export class LyraApi {
       const finalJson = gensBlock.toJson(this, sb);
       console.log("sendBlock", finalJson);
 
-      var sendRet = await nodeApi.mintToken(finalJson);
+      var sendRet = await BlockchainAPI.mintToken(finalJson);
       //console.log("sendRet", sendRet);
-      return sendRet.data;
+      return sendRet;
     } catch (error) {
       console.log("mintToken error", error);
       throw error;
@@ -382,7 +387,7 @@ export class LyraApi {
   }
 
   async createFiatWalletAsync(symbol: string): Promise<APIResult> {
-    const existsWalletRet = await nodeApi.findFiatWallet(
+    const existsWalletRet = await BlockchainAPI.findFiatWallet(
       this.accountId,
       symbol
     );
@@ -406,7 +411,7 @@ export class LyraApi {
   }
 
   async printFiat(symbol: string, count: number): Promise<APIResult> {
-    const existsWalletRet = await nodeApi.findFiatWallet(
+    const existsWalletRet = await BlockchainAPI.findFiatWallet(
       this.accountId,
       symbol
     );

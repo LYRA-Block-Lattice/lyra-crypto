@@ -25,8 +25,8 @@ export declare class LyraApi {
     address: string | null, // shop URL
     currency: string | null, // USD
     contractType: ContractTypes, // reward or discount or custom
-    tags: Record<string, string> | null): Promise<any>;
-    mintNFT(name: string, description: string, supply: number, metadataUri: string, owner: string | null): Promise<any>;
+    tags: Record<string, string> | null): Promise<AuthorizationAPIResult>;
+    mintNFT(name: string, description: string, supply: number, metadataUri: string, owner: string | null): Promise<AuthorizationAPIResult>;
     createTOT(type: HoldTypes, name: string, description: string, supply: number, metadataUri: string, descSignature: string, owner: string | null): Promise<AuthorizationAPIResult>;
     serviceRequestAsync(arg: LyraContractABI): Promise<AuthorizationAPIResult>;
     createFiatWalletAsync(symbol: string): Promise<APIResult>;

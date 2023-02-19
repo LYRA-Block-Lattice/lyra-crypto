@@ -2,7 +2,7 @@
 import { LyraCrypto } from "../src/lyra-crypto";
 import { LyraApi } from "../src/lyra-api";
 import { ContractTypes } from "../src/blocks/meta";
-import * as nodeApi from "../src/node-api";
+import { BlockchainAPI } from "../src/blockchain-api";
 jest.setTimeout(120000);
 
 describe("Lyra Crypto Library Test", (): void => {
@@ -58,7 +58,7 @@ describe("Lyra Crypto Library Test", (): void => {
   it("works with get balance", async () => {
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC"; // test 3
     // public address: LUTnKnTaeZ95MaCCeA4Y7RZeLo5PrmAipuvaaHMvrpk3awbc7VBSWNRRuhQuA5qy5SGNh7imC71jaMCdttMN1a6DrSPTP6
-    const wallet = new LyraApi(network, pvk);
+    const wallet = new LyraApi(BlockchainAPI.networkid, pvk);
     await wallet.init();
     const result = await wallet.balance();
     expect(result).toBeDefined();
@@ -70,12 +70,12 @@ describe("Lyra Crypto Library Test", (): void => {
     const dstpvt = "yEEj2uvCQji75Qps4jZdPRZj7KtFoeW2dh7pmfXjEuYXK9Uz3";
     const dst =
       "LUT5jYomQHCJQhG3Co7GadEtohpwwYtyYz1vABHGeDkLDpSJGXFfpYgD9XckRXQg2Hv2Yrb2Ade3jbecZpLf4hbVho6b5n"; // test 4
-    const wallet = new LyraApi(network, pvk);
+    const wallet = new LyraApi(BlockchainAPI.networkid, pvk);
     await wallet.init();
     const result = await wallet.balance();
     expect(result).toBeDefined();
 
-    const dstWallet = new LyraApi(network, dstpvt);
+    const dstWallet = new LyraApi(BlockchainAPI.networkid, dstpvt);
     await dstWallet.init();
     const dstResult = await dstWallet.balance();
     expect(dstResult).toBeDefined();
@@ -124,10 +124,10 @@ describe("Lyra Crypto Library Test", (): void => {
 
   it("wallet genesis and token mint", async () => {
     const keys = LyraCrypto.GenerateWallet();
-    const wallet = new LyraApi(network, keys.privateKey);
+    const wallet = new LyraApi(BlockchainAPI.networkid, keys.privateKey);
 
     const pvk = "2iWkVkodnhcvQvzQSnBKMU3PhMfhEfWVMRWC1S21qg4cNR9UxC";
-    const srcWallet = new LyraApi(network, pvk);
+    const srcWallet = new LyraApi(BlockchainAPI.networkid, pvk);
 
     await srcWallet.send(10100, keys.accountId, "LYR");
     const ret = await wallet.receive();

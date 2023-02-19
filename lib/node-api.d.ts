@@ -1,3 +1,4 @@
+export declare const setNetworkId: (id: string) => void;
 export declare const InitAxios: () => void;
 export declare const getBlockExplorerUrl: (id: string) => string;
 export declare const getLastServiceBlock: () => Promise<import("axios").AxiosResponse<any, any>>;

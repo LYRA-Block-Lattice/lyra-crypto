@@ -1,6 +1,6 @@
 {
   "name": "lyra-crypto",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",
@@ -17,7 +17,6 @@
     "@typescript-eslint/parser": "^5.48.0",
     "axios": "^1.2.2",
     "bs58": "^5.0.0",
-    "dotenv": "^16.0.3",
     "env-cmd": "^10.1.0",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",

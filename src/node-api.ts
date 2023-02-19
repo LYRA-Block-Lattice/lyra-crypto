@@ -1,5 +1,10 @@
 import axios from "axios";
-require("dotenv").config();
+
+let networkid: string = "devnet";
+
+export const setNetworkId = (id: string) => {
+  networkid = id;
+};
 
 export const InitAxios = () => {
   axios.interceptors.request.use((request) => {
@@ -14,23 +19,23 @@ export const InitAxios = () => {
 };
 
 const Block_API_v1 = axios.create({
-  baseURL: `https://${process.env.REACT_APP_NETWORK_ID}.lyra.live/api/node`
+  baseURL: `https://${networkid}.lyra.live/api/node`
 });
 
 const Block_API_v2 = axios.create({
-  baseURL: `https://${process.env.REACT_APP_NETWORK_ID}.lyra.live/api/EC`
+  baseURL: `https://${networkid}.lyra.live/api/EC`
 });
 
 const Dealer_API = axios.create({
-  baseURL: `https://dealer${process.env.REACT_APP_NETWORK_ID}.lyra.live/api/dealer`
+  baseURL: `https://dealer${networkid}.lyra.live/api/dealer`
 });
 
 const Start_API = axios.create({
-  baseURL: `https://start${process.env.REACT_APP_NETWORK_ID}.lyra.live/svc`
+  baseURL: `https://start${networkid}.lyra.live/svc`
 });
 
 export const getBlockExplorerUrl = (id: string) => {
-  switch (process.env.REACT_APP_NETWORK_ID) {
+  switch (networkid) {
     case "testnet":
       return "https://nebulatestnet.lyra.live/showblock/" + id;
     case "mainnet":

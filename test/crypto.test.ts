@@ -2,13 +2,8 @@
 import { LyraCrypto } from "../src/lyra-crypto";
 import { LyraApi } from "../src/lyra-api";
 import { ContractTypes } from "../src/blocks/meta";
-
-require("dotenv").config();
-
+import * as nodeApi from "../src/node-api";
 jest.setTimeout(120000);
-
-const network = process.env.REACT_APP_NETWORK_ID!;
-console.log("network: " + network);
 
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {

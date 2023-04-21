@@ -1,6 +1,6 @@
 {
   "name": "lyra-crypto",
-  "version": "0.4.0",
+  "version": "0.4.3",
   "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",
@@ -73,5 +73,9 @@
     "uuid": "^9.0.0",
     "web-encoding": "^1.1.5",
     "web-streams-polyfill": "^3.2.1"
-  }
+  },
+  "files": [
+    "lib/",
+    "src/my-json-stringify.js"
+  ]
 }

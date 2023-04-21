@@ -5,6 +5,8 @@ import { ContractTypes } from "../src/blocks/meta";
 import { BlockchainAPI } from "../src/blockchain-api";
 jest.setTimeout(120000);
 
+BlockchainAPI.setNetworkId("testnet");
+
 describe("Lyra Crypto Library Test", (): void => {
   test("key validate", (): void => {
     const pvk = "2gbESTeBHsgt8um1aNN2dC9jajEDk3CoEupwmN6TRJQckyRbHa";
@@ -60,6 +62,7 @@ describe("Lyra Crypto Library Test", (): void => {
     // public address: LUTnKnTaeZ95MaCCeA4Y7RZeLo5PrmAipuvaaHMvrpk3awbc7VBSWNRRuhQuA5qy5SGNh7imC71jaMCdttMN1a6DrSPTP6
     const wallet = new LyraApi(BlockchainAPI.networkid, pvk);
     await wallet.init();
+    await wallet.receive((blk) => console.log("got new block", blk));
     const result = await wallet.balance();
     expect(result).toBeDefined();
     expect(result?.balance["LYR"]).toBeGreaterThan(10000);
@@ -77,6 +80,7 @@ describe("Lyra Crypto Library Test", (): void => {
 
     const dstWallet = new LyraApi(BlockchainAPI.networkid, dstpvt);
     await dstWallet.init();
+    await dstWallet.receive((blk) => console.log("got new block", blk));
     const dstResult = await dstWallet.balance();
     expect(dstResult).toBeDefined();
 
@@ -88,7 +92,9 @@ describe("Lyra Crypto Library Test", (): void => {
     const balaceResult = await wallet.balance();
     expect(result?.balance["LYR"] - balaceResult?.balance["LYR"]).toBe(2); // amount + send fee
 
-    const recvResult = await dstWallet.receive();
+    const recvResult = await dstWallet.receive((blk) =>
+      console.log("got new block", blk)
+    );
     if (recvResult.resultCode != 0 && recvResult.resultCode != 30)
       console.log(recvResult);
     expect(recvResult.resultCode == 0 || recvResult.resultCode == 30).toBe(
@@ -130,7 +136,9 @@ describe("Lyra Crypto Library Test", (): void => {
     const srcWallet = new LyraApi(BlockchainAPI.networkid, pvk);
 
     await srcWallet.send(10100, keys.accountId, "LYR");
-    const ret = await wallet.receive();
+    const ret = await wallet.receive((blk) =>
+      console.log("got new block", blk)
+    );
     expect(ret.resultCode).toBe(30);
     const balanceResult = await wallet.balance();
     expect(balanceResult?.balance["LYR"]).toBe(10100);
@@ -143,11 +151,11 @@ describe("Lyra Crypto Library Test", (): void => {
       8,
       1000000,
       true,
-      null,
-      null,
-      null,
+      undefined,
+      undefined,
+      undefined,
       ContractTypes.Cryptocurrency,
-      null
+      undefined
     );
     console.log("Mint Token Result: ", mintRet);
     expect(mintRet.resultCode).toBe(0);

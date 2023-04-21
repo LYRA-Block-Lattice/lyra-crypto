@@ -1,3 +1,4 @@
+import { Block } from "./block";
 export interface Amounts {
     [key: string]: number;
 }
@@ -130,6 +131,7 @@ export declare enum HoldTypes {
     TOT = 3,
     SVC = 4
 }
+export declare function getHoldType(token: string): HoldTypes;
 export declare enum APIResultCodes {
     Success = 0,
     UnknownError = 1,
@@ -362,6 +364,22 @@ export declare enum APIResultCodes {
     InvalidPrice = 556,
     DuplicateBlock = 557
 }
+export declare enum ProfitingType {
+    Node = 0,
+    Oracle = 1,
+    Merchant = 2,
+    Yield = 3,
+    Orgnization = 4
+}
+export declare enum AccountChangeTypes {
+    Genesis = 0,
+    SendToMe = 1,
+    ReceiveFromMe = 2,
+    MeSend = 3,
+    MeReceive = 4,
+    MyContract = 5,
+    OtherContract = 6
+}
 export declare class APIResult {
     resultCode: APIResultCodes;
     resultMessage: string;
@@ -371,7 +389,33 @@ export declare class AuthorizationAPIResult extends APIResult {
 }
 export declare class BlockAPIResult extends APIResult {
     blockData: string;
-    ResultBlockType: BlockTypes;
+    resultBlockType: BlockTypes;
+    getBlock(): Block;
+}
+export declare class MultiBlockAPIResult extends APIResult {
+    blockDatas: string[];
+    resultBlockTypes: BlockTypes[];
+    getDaos(): Block[];
+}
+export declare class SimpleJsonAPIResult extends APIResult {
+    jsonString: string;
+    getdata(): any;
+}
+export declare class BalanceChanges {
+    changes?: {
+        [key: string]: number;
+    };
+    feeAmount?: number;
+    feeCode?: string;
+}
+export declare class NewTransferAPIResult2 extends APIResult {
+    sourceHash: string;
+    transfer: BalanceChanges;
+    nonFungibleToken?: {};
+}
+export declare class ImageUploadResult extends APIResult {
+    hash: string;
+    url: string;
 }
 export declare class LyraContractABI {
     svcReq: string;
@@ -427,4 +471,29 @@ export declare class BrokerActions {
     static readonly BRK_UNI_TRDCANCEL = "UTRDCANCEL";
     static readonly BRK_UNI_CRDPT = "UORDCRDPT";
     static readonly BRK_UNI_RSLDPT = "UORDRSLDPT";
+}
+export declare enum UniOrderStatus {
+    Open = 0,
+    Partial = 10,
+    Closed = 30,
+    Delist = 50
+}
+export declare enum UniTradeStatus {
+    Open = 0,
+    Processing = 1,
+    Closed = 30,
+    Dispute = 40,
+    DisputeClosed = 45,
+    Canceled = 50
+}
+export interface NftMetadata {
+    name: string;
+    description: string;
+    image: string;
+    external_url?: string;
+    attributes?: NftAttribute[];
+}
+export interface NftAttribute {
+    trait_type: string;
+    value: string;
 }

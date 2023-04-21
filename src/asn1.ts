@@ -1,4 +1,5 @@
-import * as bigintConversion from "bigint-conversion";
+const bigintConversion = require("bigint-conversion");
+import { Buffer } from "buffer";
 
 export function decodeASN1Sequence(encoded: string): bigint[] {
   const integers: bigint[] = [];
@@ -44,7 +45,7 @@ function bitLength(n: bigint): number {
 }
 
 function isBigIntNegative(x: bigint): boolean {
-  const zero = BigInt.asIntN(bitLength(x), 0n);
+  const zero = BigInt.asIntN(bitLength(x), BigInt(0));
   return x < zero;
 }
 
@@ -52,7 +53,7 @@ function getBigIntAbsoluteValue(x: bigint): bigint {
   const negative = isBigIntNegative(x);
   if (negative) {
     // Compute the 2's complement of x, which is equivalent to negating x
-    const twoComplement = ~x + 1n;
+    const twoComplement = ~x + BigInt(1);
 
     // Convert the 2's complement to a non-negative BigInt using asUintN()
     return BigInt.asUintN(bitLength(x), twoComplement);

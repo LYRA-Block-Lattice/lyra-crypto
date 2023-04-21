@@ -1,5 +1,7 @@
 import { LyraApi } from "../lyra-api";
-import { AccountTypes, AuthorizationFeeTypes, BlockTypes, ContractTypes, NonFungibleTokenTypes, HoldTypes } from "./meta";
+import { AccountTypes, AuthorizationFeeTypes, BlockTypes, ContractTypes, NonFungibleTokenTypes, HoldTypes, UniOrderStatus, UniTradeStatus, ProfitingType } from "./meta";
+export declare const toBalanceBigInt: (balance: bigint) => bigint;
+export declare const numberToBalanceBigInt: (value: number) => bigint;
 export declare class LyraGlobal {
     static readonly DatabaseVersion = 11;
     static readonly BALANCERATIO = 100000000;
@@ -7,16 +9,21 @@ export declare class LyraGlobal {
     static readonly MANAGEDTAG = "managed";
     static readonly OFFICIALTICKERCODE = "LYR";
     static readonly GUILDACCOUNTID = "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
+    static readonly OfferingNetworkFeeRatio = 0.002;
+    static readonly BidingNetworkFeeRatio = 0;
     static GetListingFeeFor: () => number;
+}
+export interface BlockTags {
+    [key: string]: string;
 }
 export declare class Block {
     Height: number;
     TimeStamp: string;
     Version: number;
     BlockType: BlockTypes;
-    PreviousHash: string | null;
+    PreviousHash: string | undefined;
     ServiceHash: string;
-    Tags: any;
+    Tags: BlockTags | undefined;
     constructor(blockData: string | undefined);
     GetBlockType(): BlockTypes;
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
@@ -42,7 +49,7 @@ export declare class CurrentServiceBlock extends SignedBlock {
 export declare class TransactionBlock extends Block {
     AccountID: string;
     Balances: {
-        [key: string]: number;
+        [key: string]: bigint;
     };
     Fee: number;
     FeeCode: string;
@@ -59,7 +66,7 @@ export declare class SendTransferBlock extends TransactionBlock {
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
 }
 export declare class ReceiveTransferBlock extends TransactionBlock {
-    SourceHash: string | null;
+    SourceHash: string | undefined;
     constructor(blockData: string | undefined);
     GetBlockType(): BlockTypes;
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
@@ -81,16 +88,16 @@ export declare class TokenGenesisBlock extends ReceiveTransferBlock {
     IsFinalSupply: boolean;
     IsNonFungible: boolean;
     NonFungibleType: NonFungibleTokenTypes;
-    NonFungibleKey: string;
-    Owner: string | null;
-    Address: string | null;
-    Currency: string | null;
-    Icon: string | null;
-    Image: string | null;
-    Custom1: string | null;
-    Custom2: string | null;
-    Custom3: string | null;
-    constructor(blockData: string | undefined);
+    NonFungibleKey: string | undefined;
+    Owner: string | undefined;
+    Address: string | undefined;
+    Currency: string | undefined;
+    Icon: string | undefined;
+    Image: string | undefined;
+    Custom1: string | undefined;
+    Custom2: string | undefined;
+    Custom3: string | undefined;
+    constructor(blockData: string);
     GetBlockType(): BlockTypes;
     toJson(wallet: LyraApi, sb: CurrentServiceBlock): string;
 }
@@ -125,4 +132,35 @@ export declare class UniTrade {
     pay: number;
     payVia: string;
     constructor(daoId: string, dealerId: string, orderId: string, orderOwnerId: string, offby: HoldTypes, offering: string, bidby: HoldTypes, biding: string, price: number, eqprice: number, amount: number, cltamt: number, pay: number, payVia: string);
+}
+export interface IBrokerAccount {
+    AccountID: string;
+    TimeStamp: Date;
+    Name: string;
+    OwnerAccountId: string;
+    RelatedTx: string;
+}
+export interface IDaoTreasure {
+    [key: string]: number;
+}
+export interface IProfiting extends IBrokerAccount {
+    PType: ProfitingType;
+    ShareRito: number;
+    Seats: number;
+}
+export interface IDao extends IProfiting {
+    SellerFeeRatio: number;
+    BuyerFeeRatio: number;
+    SellerPar: number;
+    BuyerPar: number;
+    Treasure: IDaoTreasure;
+    Description: string;
+}
+export interface IUniOrder extends IBrokerAccount {
+    Order: UniOrder;
+    UOStatus: UniOrderStatus;
+}
+export interface IUniTrade extends IBrokerAccount {
+    Trade: UniTrade;
+    UTStatus: UniTradeStatus;
 }

@@ -6,9 +6,20 @@ import {
   BlockTypes,
   ContractTypes,
   NonFungibleTokenTypes,
-  HoldTypes
+  HoldTypes,
+  UniOrderStatus,
+  UniTradeStatus,
+  ProfitingType
 } from "./meta";
-import stringify from "json-stable-stringify";
+
+const stringify = require("../my-json-stringify");
+var JSONbig = require("json-bigint");
+
+const maxInt64 = BigInt("9223372036854775807");
+export const toBalanceBigInt = (balance: bigint): bigint =>
+  balance * BigInt(100000000);
+export const numberToBalanceBigInt = (value: number): bigint =>
+  BigInt(Math.round(value * 100000000)) as bigint;
 
 export class LyraGlobal {
   static readonly DatabaseVersion = 11;
@@ -19,7 +30,13 @@ export class LyraGlobal {
   static readonly GUILDACCOUNTID =
     "L8cqJqYPyx9NjiRYf8KyCjBaCmqdgvZJtEkZ7M9Hf7LnzQU3DamcurxeDEkws9HXPjLaGi9CVgcRwdCp377xLEB1qcX15";
 
-  static GetListingFeeFor = () => 10;
+  static readonly OfferingNetworkFeeRatio = 0.002;
+  static readonly BidingNetworkFeeRatio = 0;
+  static GetListingFeeFor = () => 100;
+}
+
+export interface BlockTags {
+  [key: string]: string;
 }
 
 export class Block {
@@ -27,16 +44,16 @@ export class Block {
   TimeStamp: string;
   Version: number;
   BlockType: BlockTypes;
-  PreviousHash: string | null;
-  ServiceHash: string;
-  Tags: any;
+  PreviousHash: string | undefined;
+  ServiceHash!: string;
+  Tags: BlockTags | undefined;
 
   constructor(blockData: string | undefined) {
     this.TimeStamp = new Date().toISOString();
     this.Version = LyraGlobal.DatabaseVersion;
     this.BlockType = this.GetBlockType();
-    this.PreviousHash = null;
-    this.Tags = null;
+    this.PreviousHash = undefined;
+    this.Tags = undefined;
     if (blockData === undefined) {
       this.Height = 1;
     } else {
@@ -68,7 +85,9 @@ export class Block {
       Signature: signature,
       Hash: hash
     };
-    var finalJson = JSON.stringify(finalBlock);
+    //var finalJson = JSON.stringify(finalBlock);
+    const finalJson = JSONbig.stringify(finalBlock);
+    console.log("final block:", finalJson);
     return finalJson;
   }
 }
@@ -116,33 +135,48 @@ export class CurrentServiceBlock extends SignedBlock {
 }
 
 export class TransactionBlock extends Block {
-  AccountID: string;
+  AccountID!: string;
   Balances: {
-    [key: string]: number;
+    [key: string]: bigint;
   };
-  Fee: number;
-  FeeCode: string;
-  FeeType: AuthorizationFeeTypes;
+  Fee!: number;
+  FeeCode!: string;
+  FeeType!: AuthorizationFeeTypes;
   NonFungibleToken: any;
   VoteFor: any;
 
   constructor(blockData: string | undefined) {
     super(blockData);
-    this.NonFungibleToken = null;
+    this.NonFungibleToken = undefined;
     if (blockData === undefined) {
       this.Balances = {};
 
-      this.VoteFor = null;
+      this.VoteFor = undefined;
     } else {
-      const decodedBlockData = JSON.parse(blockData);
+      const decodedBlockData = JSONbig.parse(blockData);
       this.AccountID = decodedBlockData.AccountID;
-      this.Balances = decodedBlockData.Balances;
 
-      this.VoteFor = decodedBlockData.VoteFor;
+      this.Balances = {};
+      for (const key in decodedBlockData.Balances) {
+        this.Balances[key] = BigInt(decodedBlockData.Balances[key]);
+      }
+
+      if (decodedBlockData.VoteFor != null)
+        this.VoteFor = decodedBlockData.VoteFor;
     }
   }
 
   toJson(wallet: LyraApi, sb: CurrentServiceBlock): string {
+    // check balances to make sure they are valid
+    for (const key in this.Balances) {
+      if (this.Balances[key] < 0) {
+        throw new Error("Balance is negative.");
+      }
+      if (this.Balances[key] > maxInt64) {
+        throw new Error("Balance is too big.");
+      }
+    }
+
     this.AccountID = wallet.accountId;
     // setup service block related fields
     this.FeeCode = sb.FeeTicker;
@@ -151,7 +185,7 @@ export class TransactionBlock extends Block {
 }
 
 export class SendTransferBlock extends TransactionBlock {
-  DestinationAccountId: string;
+  DestinationAccountId!: string;
 
   constructor(blockData: string | undefined) {
     super(blockData);
@@ -170,13 +204,14 @@ export class SendTransferBlock extends TransactionBlock {
     // setup service block related fields
     this.Fee = sb.TransferFee;
     this.FeeType = AuthorizationFeeTypes.Regular;
-    this.Balances[sb.FeeTicker] -= sb.TransferFee * LyraGlobal.BALANCERATIO;
+    this.Balances[sb.FeeTicker] =
+      this.Balances[sb.FeeTicker] - toBalanceBigInt(BigInt(sb.TransferFee));
     return super.toJson(wallet, sb);
   }
 }
 
 export class ReceiveTransferBlock extends TransactionBlock {
-  SourceHash: string | null;
+  SourceHash!: string | undefined;
 
   constructor(blockData: string | undefined) {
     super(blockData);
@@ -221,27 +256,27 @@ export class OpenWithReceiveTransferBlock extends ReceiveTransferBlock {
 }
 
 export class TokenGenesisBlock extends ReceiveTransferBlock {
-  Ticker: string;
-  DomainName: string;
-  ContractType: ContractTypes;
-  RenewalDate: Date;
-  Edition: number;
-  Description: string;
-  Precision: number;
-  IsFinalSupply: boolean;
-  IsNonFungible: boolean;
-  NonFungibleType: NonFungibleTokenTypes;
-  NonFungibleKey: string;
-  Owner: string | null;
-  Address: string | null;
-  Currency: string | null;
-  Icon: string | null;
-  Image: string | null;
-  Custom1: string | null;
-  Custom2: string | null;
-  Custom3: string | null;
+  Ticker!: string;
+  DomainName!: string;
+  ContractType!: ContractTypes;
+  RenewalDate!: Date;
+  Edition!: number;
+  Description!: string;
+  Precision!: number;
+  IsFinalSupply!: boolean;
+  IsNonFungible!: boolean;
+  NonFungibleType!: NonFungibleTokenTypes;
+  NonFungibleKey!: string | undefined;
+  Owner!: string | undefined;
+  Address!: string | undefined;
+  Currency!: string | undefined;
+  Icon!: string | undefined;
+  Image!: string | undefined;
+  Custom1!: string | undefined;
+  Custom2!: string | undefined;
+  Custom3!: string | undefined;
 
-  constructor(blockData: string | undefined) {
+  constructor(blockData: string) {
     super(blockData);
     if (blockData === undefined) {
       throw new Error("Should not be called with blockData");
@@ -259,8 +294,9 @@ export class TokenGenesisBlock extends ReceiveTransferBlock {
     //console.log("sb: ", sb);
     this.Fee = sb.TokenGenerationFee;
     this.FeeType = AuthorizationFeeTypes.Regular;
-    this.Balances[sb.FeeTicker] -=
-      sb.TokenGenerationFee * LyraGlobal.BALANCERATIO;
+    this.Balances[sb.FeeTicker] -= BigInt(
+      sb.TokenGenerationFee * LyraGlobal.BALANCERATIO
+    );
     return super.toJson(wallet, sb);
   }
 }
@@ -333,4 +369,41 @@ export class UniTrade {
     this.pay = pay;
     this.payVia = payVia;
   }
+}
+
+export interface IBrokerAccount {
+  AccountID: string;
+  TimeStamp: Date;
+  Name: string;
+  OwnerAccountId: string;
+  RelatedTx: string;
+}
+
+export interface IDaoTreasure {
+  [key: string]: number;
+}
+
+export interface IProfiting extends IBrokerAccount {
+  PType: ProfitingType;
+  ShareRito: number;
+  Seats: number;
+}
+
+export interface IDao extends IProfiting {
+  SellerFeeRatio: number;
+  BuyerFeeRatio: number;
+  SellerPar: number;
+  BuyerPar: number;
+  Treasure: IDaoTreasure;
+  Description: string;
+}
+
+export interface IUniOrder extends IBrokerAccount {
+  Order: UniOrder;
+  UOStatus: UniOrderStatus;
+}
+
+export interface IUniTrade extends IBrokerAccount {
+  Trade: UniTrade;
+  UTStatus: UniTradeStatus;
 }

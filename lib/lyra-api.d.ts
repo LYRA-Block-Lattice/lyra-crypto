@@ -1,5 +1,5 @@
-import { UniOrder, UniTrade } from "./blocks/block";
-import { APIResult, AuthorizationAPIResult, ContractTypes, HoldTypes, LyraContractABI } from "./blocks/meta";
+import { ReceiveTransferBlock, UniOrder, UniTrade } from "./blocks/block";
+import { Amounts, APIResult, AuthorizationAPIResult, ContractTypes, HoldTypes, LyraContractABI } from "./blocks/meta";
 export declare class LyraApi {
     private network;
     private nodeAddress?;
@@ -8,31 +8,29 @@ export declare class LyraApi {
     constructor(network: string, privateKey: string, node?: string);
     init(): void;
     sign(data: string): string;
-    sendEx(destinationAccountId: string, amounts: {
-        [key: string]: number;
-    }, tags: {
+    sendEx(destinationAccountId: string, amounts: Amounts, tags: {
         [key: string]: string;
-    } | null): Promise<AuthorizationAPIResult>;
+    } | undefined): Promise<AuthorizationAPIResult>;
     send(amount: number, destAddr: string, token: string): Promise<AuthorizationAPIResult>;
-    receive(): Promise<any>;
+    receive(onNewBlock: (block: ReceiveTransferBlock) => void): Promise<AuthorizationAPIResult | import("./blocks/meta").NewTransferAPIResult2>;
     balance(): Promise<{
         data: any;
         balance: any;
     } | undefined>;
     history(start: Date, end: Date, count: number): Promise<any>;
     close(): void;
-    mintToken(tokenName: string, domainName: string, description: string, precision: number, supply: number, isFinalSupply: boolean, owner: string | null, // shop name
-    address: string | null, // shop URL
-    currency: string | null, // USD
+    mintToken(tokenName: string, domainName: string, description: string, precision: number, supply: number, isFinalSupply: boolean, owner: string | undefined, // shop name
+    address: string | undefined, // shop URL
+    currency: string | undefined, // USD
     contractType: ContractTypes, // reward or discount or custom
-    tags: Record<string, string> | null): Promise<AuthorizationAPIResult>;
-    mintNFT(name: string, description: string, supply: number, metadataUri: string, owner: string | null): Promise<AuthorizationAPIResult>;
-    createTOT(type: HoldTypes, name: string, description: string, supply: number, metadataUri: string, descSignature: string, owner: string | null): Promise<AuthorizationAPIResult>;
-    serviceRequestAsync(arg: LyraContractABI): Promise<AuthorizationAPIResult>;
+    tags: Record<string, string> | undefined): Promise<AuthorizationAPIResult>;
+    mintNFT(name: string, description: string, supply: number, metadataUri: string, owner: string | undefined): Promise<AuthorizationAPIResult>;
+    createTOT(type: HoldTypes, name: string, description: string, supply: number, metadataUri: string, descSignature: string, owner: string | undefined): Promise<AuthorizationAPIResult>;
+    serviceRequestAsync(type: string, arg: LyraContractABI): Promise<AuthorizationAPIResult>;
     createFiatWalletAsync(symbol: string): Promise<APIResult>;
     printFiat(symbol: string, count: number): Promise<APIResult>;
-    createUniOrder(order: UniOrder): Promise<AuthorizationAPIResult>;
-    createUniTrade(trade: UniTrade): Promise<AuthorizationAPIResult>;
+    createOrder(order: UniOrder): Promise<AuthorizationAPIResult>;
+    createTrade(trade: UniTrade): Promise<AuthorizationAPIResult>;
     DelistUniOrder(daoId: string, orderId: string): Promise<AuthorizationAPIResult>;
     CloseUniOrder(daoId: string, orderId: string): Promise<AuthorizationAPIResult>;
 }

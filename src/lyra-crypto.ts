@@ -1,7 +1,8 @@
 // change require to import
 var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
-import { convertDerToP1393, decodeASN1Sequence } from "./asn1";
+import { TextEncoder } from "web-encoding";
+import { convertDerToP1393 } from "./asn1";
 import * as asn1lib from "asn1js";
 
 export class LyraCrypto {
@@ -92,7 +93,7 @@ export class LyraCrypto {
   static async sha256alt(input: string): Promise<string> {
     const encoder = new TextEncoder();
     const data = encoder.encode(input);
-    const hash = await crypto.subtle.digest("SHA-256", data);
+    const hash = await KJUR.crypto.subtle.digest("SHA-256", data);
     return bs58.encode(new Uint8Array(hash));
     // return Array.from(new Uint8Array(hash))
     //   .map((b) => b.toString(16).padStart(2, "0"))
@@ -225,8 +226,8 @@ export class LyraCrypto {
     //const sigbuff2 = this.convertDerToP1393(sigbuff);
 
     // test
-    const sigbuff3 = this.convertP1393ToDer(sigbuff);
-    const sigbuff3x = this.fromHexString(sigValueHex);
+    //const sigbuff3 = this.convertP1393ToDer(sigbuff);
+    //const sigbuff3x = this.fromHexString(sigValueHex);
     //console.log("sigbuff3: ", sigbuff3);
     //console.log("sigbuff3x: ", sigbuff3x);
 
@@ -284,7 +285,7 @@ export class LyraCrypto {
   }
 
   private static toUTF8Array(str: string) {
-    var utf8 = [];
+    var utf8: number[] = [];
     for (var i = 0; i < str.length; i++) {
       var charcode = str.charCodeAt(i);
       if (charcode < 0x80) utf8.push(charcode);

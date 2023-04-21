@@ -1,3 +1,6 @@
+import { Block } from "./block";
+var JSONbig = require("json-bigint");
+
 export interface Amounts {
   [key: string]: number;
 }
@@ -243,6 +246,22 @@ export enum HoldTypes {
   Fiat,
   TOT,
   SVC
+}
+
+export function getHoldType(token: string): HoldTypes {
+  const secs = token.split("/");
+  switch (secs[0]) {
+    case "tot":
+      return HoldTypes.TOT;
+    case "nft":
+      return HoldTypes.NFT;
+    case "svc":
+      return HoldTypes.SVC;
+    case "fiat":
+      return HoldTypes.Fiat;
+    default:
+      return HoldTypes.Token;
+  }
 }
 
 export enum APIResultCodes {
@@ -510,23 +529,82 @@ export enum APIResultCodes {
   DuplicateBlock
 }
 
+export enum ProfitingType {
+  Node,
+  Oracle,
+  Merchant,
+  Yield,
+  Orgnization
+}
+
+export enum AccountChangeTypes {
+  Genesis,
+  SendToMe,
+  ReceiveFromMe,
+  MeSend,
+  MeReceive,
+  MyContract,
+  OtherContract
+}
+
 export class APIResult {
-  public resultCode: APIResultCodes;
-  public resultMessage: string;
+  public resultCode!: APIResultCodes;
+  public resultMessage!: string;
 }
 export class AuthorizationAPIResult extends APIResult {
-  public txHash: string;
+  public txHash!: string;
 }
 
 export class BlockAPIResult extends APIResult {
-  public blockData: string;
-  public ResultBlockType: BlockTypes;
+  public blockData!: string;
+  public resultBlockType!: BlockTypes;
+
+  getBlock(): Block {
+    return JSONbig.parse(this.blockData);
+  }
+}
+
+export class MultiBlockAPIResult extends APIResult {
+  public blockDatas!: string[];
+  public resultBlockTypes!: BlockTypes[];
+
+  getDaos(): Block[] {
+    const blocks: Block[] = [];
+    for (let i = 0; i < this.blockDatas.length; i++) {
+      blocks.push(JSON.parse(this.blockDatas[i]));
+    }
+    return blocks;
+  }
+}
+
+export class SimpleJsonAPIResult extends APIResult {
+  public jsonString!: string;
+  public getdata(): any {
+    return JSON.parse(this.jsonString);
+  }
+}
+
+export class BalanceChanges {
+  changes?: { [key: string]: number };
+  feeAmount?: number;
+  feeCode?: string;
+}
+
+export class NewTransferAPIResult2 extends APIResult {
+  public sourceHash!: string;
+  public transfer!: BalanceChanges;
+  public nonFungibleToken?: {};
+}
+
+export class ImageUploadResult extends APIResult {
+  hash!: string;
+  url!: string;
 }
 
 export class LyraContractABI {
-  svcReq: string;
-  targetAccountId: string;
-  amounts: { [key: string]: number };
+  svcReq!: string;
+  targetAccountId!: string;
+  amounts!: { [key: string]: number };
   objArgument: any;
 }
 
@@ -603,4 +681,53 @@ export class BrokerActions {
   // Universal Dispute
   public static readonly BRK_UNI_CRDPT = "UORDCRDPT";
   public static readonly BRK_UNI_RSLDPT = "UORDRSLDPT";
+}
+
+export enum UniOrderStatus {
+  Open, // just add, trade begin
+  Partial = 10, // partial traded, total count reduced
+  Closed = 30, // close order and all pending trading, get back collateral
+  Delist = 50 // prevent order from trading, but wait for all trading finished. after which order can be closed.
+}
+
+export enum UniTradeStatus {
+  // start
+  Open,
+
+  // trade begins
+  Processing,
+  //Arrived,
+  //BidSent = 10,
+  //BidReceived,
+  //OfferSent,
+  //OfferReceived,
+
+  //// sku to sku
+  //BothShipping,
+  //BothConfirmed,
+
+  // special trade has special state, add bellow.
+
+  // trade ends successfull
+  Closed = 30,
+
+  // trade in abnormal states
+  Dispute = 40,
+  DisputeClosed = 45,
+
+  // canceled trade. not count.
+  Canceled = 50
+}
+
+export interface NftMetadata {
+  name: string;
+  description: string;
+  image: string;
+  external_url?: string;
+  attributes?: NftAttribute[];
+}
+
+export interface NftAttribute {
+  trait_type: string;
+  value: string;
 }

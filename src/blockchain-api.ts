@@ -1,21 +1,121 @@
-import { AuthorizationAPIResult, BlockAPIResult } from "./blocks/meta";
-import ky from "ky-universal";
+import { plainToClass } from "class-transformer";
+
+import {
+  APIResult,
+  AuthorizationAPIResult,
+  BlockAPIResult,
+  ImageUploadResult,
+  MultiBlockAPIResult,
+  NewTransferAPIResult2,
+  NftMetadata,
+  SimpleJsonAPIResult
+} from "./blocks/meta";
+
+import { Block, IDao, IUniOrder, TokenGenesisBlock } from "./blocks/block";
+import axios, { AxiosRequestConfig } from "axios";
+
+export type FindToken = {
+  token: string;
+  domain: string;
+  isTOT: boolean;
+  name: string;
+};
+
+export type FindTokenList = FindToken[];
+export interface IOrdersResult {
+  OverStats: { _id: number; Count: number }[];
+  OwnerStats: {
+    _id: {
+      Owner: string;
+      State: number;
+      Name: string;
+      Avatar: string;
+    };
+    Count: number;
+  }[];
+  Daos: IDao[]; // could be a more specific type if we know the shape of the data
+  Orders: any[]; // could be a more specific type if we know the shape of the data
+}
+
+export interface IOwnerOrder {
+  daoid: string;
+  orderid: string;
+  status: string;
+  offering: string;
+  biding: string;
+  amount: number;
+  price: number;
+  limitmin: number;
+  limitmax: number;
+  time: string;
+  sold: number;
+  shelf: number;
+}
+
+export interface IOwnerTrade {
+  dir: string;
+  tradeId: string;
+  status: string;
+  offering: string;
+  biding: string;
+  amount: number;
+  price: number;
+  time: string;
+}
+
+export interface IDealerOrder {
+  OrderId: string;
+  Blocks: {
+    Order: IUniOrder;
+    Offgen: TokenGenesisBlock;
+    Bidgen: TokenGenesisBlock;
+    Dao: IDao;
+  };
+  Users: {
+    Seller: {
+      UserName: string;
+      AccountId: string;
+      AvatarId: string;
+    };
+    Author: {
+      UserName: string;
+      AccountId: string;
+      AvatarId: string;
+    };
+  };
+  Meta: NftMetadata;
+}
+
+export interface IDealerInfo {
+  Version: string;
+  Name: string;
+  AccountId: string;
+  ServiceId: string;
+  TelegramBotUsername: string;
+}
+
+type Constructor<T> = new () => T;
 
 export class BlockchainAPI {
-  static networkid: string = "devnet";
+  static networkid: string = "testnet";
 
   static Block_API_v1: string;
   static Block_API_v2: string;
   static Dealer_API: string;
   static Start_API: string;
 
-  static setNetworkId = (id: string) => {
-    BlockchainAPI.networkid = id;
+  static setNetworkId = (id: string | undefined) => {
+    console.log("setNetworkId", id);
+    this.networkid = id || "devnet";
 
-    BlockchainAPI.Block_API_v1 = `https://${this.networkid}.lyra.live/api/node`;
-    BlockchainAPI.Block_API_v2 = `https://${this.networkid}.lyra.live/api/EC`;
-    BlockchainAPI.Dealer_API = `https://dealer${this.networkid}.lyra.live/api/dealer`;
-    BlockchainAPI.Start_API = `https://start${this.networkid}.lyra.live/svc`;
+    this.Block_API_v1 = `https://${this.networkid}.lyra.live/api/node`;
+    this.Block_API_v2 = `https://${this.networkid}.lyra.live/api/EC`;
+    this.Dealer_API = `https://dealer${
+      this.networkid === "mainnet" ? "" : this.networkid
+    }.lyra.live/api/dealer`;
+    this.Start_API = `https://start${
+      this.networkid === "mainnet" ? "" : this.networkid
+    }.lyra.live/svc`;
   };
 
   static getBlockExplorerUrl = (id: string) => {
@@ -29,31 +129,47 @@ export class BlockchainAPI {
     }
   };
 
+  static fetchJson2 = async <T>(
+    resultType: Constructor<T>,
+    url: string,
+    options: AxiosRequestConfig = {}
+  ): Promise<T> => {
+    const response = await axios.get(url, options);
+    const data = await response.data;
+    const result = plainToClass(resultType, data);
+    return result;
+  };
+
   static async fetchJson<T>(
     url: string,
-    options: RequestInit = {}
+    options: AxiosRequestConfig = {}
   ): Promise<T> {
-    const response = await ky.get(url, options);
-    const data = await response.json();
+    // 设置默认超时为30秒（30000毫秒）
+    const defaultTimeout = { timeout: 30000 };
+
+    // 使用传入的options与默认超时合并，调用者的设置优先
+    const mergedOptions = { ...defaultTimeout, ...options };
+
+    const response = await axios.get(url, mergedOptions);
+    const data = await response.data;
     return data as T;
   }
 
   static async postJson<T>(
     url: string,
-    json: string,
-    options?: RequestInit
+    json: any,
+    options?: AxiosRequestConfig
   ): Promise<T> {
-    const response = await ky.post(url, {
-      method: "POST",
+    console.log("Posting to ", url);
+    const response = await axios.post(url, json, {
       headers: {
         "Content-Type": "application/json",
         ...options?.headers
       },
-      body: json,
       ...options
     });
 
-    return response.json() as Promise<T>;
+    return response.data as Promise<T>;
   }
 
   // Blockchain API V1
@@ -85,12 +201,25 @@ export class BlockchainAPI {
     );
 
   static getUnreceived = (accountId: string) =>
-    this.fetchJson<any>(
+    this.fetchJson2(
+      NewTransferAPIResult2,
       `${this.Block_API_v1}/LookForNewTransfer2?AccountId=${accountId}`
     );
 
+  static findTokens = (keyword: string, cat: string) =>
+    this.fetchJson<FindTokenList>(
+      `${this.Block_API_v1}/FindTokens?q=${keyword}&cat=${cat}`
+    );
+
+  static getBlockBySourceHash = (hash: string) =>
+    this.fetchJson2(
+      BlockAPIResult,
+      `${this.Block_API_v1}/GetBlockBySourceHash?Hash=${hash}`
+    );
+
   static findFiatWallet = (owner: string, symbol: string) =>
-    this.fetchJson<any>(
+    this.fetchJson2(
+      BlockAPIResult,
       `${this.Block_API_v1}/FindFiatWallet?owner=${owner}&symbol=${symbol}`
     );
 
@@ -122,7 +251,10 @@ export class BlockchainAPI {
   };
 
   static searchDao = (q: string) =>
-    this.fetchJson<any>(`${this.Block_API_v1}/FindDaos?q=${q}`);
+    this.fetchJson2(
+      MultiBlockAPIResult,
+      `${this.Block_API_v1}/FindDaos?q=${q}`
+    );
 
   // Get a Tx block by AccountId
   static GetLastBlock = (accountId: string) =>
@@ -143,30 +275,51 @@ export class BlockchainAPI {
     this.fetchJson<any>(`${this.Block_API_v2}/Balance?accountId=${accountId}`);
 
   // Dealer API
+  static startWallet = (accountId: string, signature: string) =>
+    this.fetchJson2(
+      APIResult,
+      `${this.Dealer_API}/WalletCreated?accountId=${accountId}&signature=${signature}`
+    );
+
+  static getPrices = async (): Promise<SimpleJsonAPIResult> =>
+    this.fetchJson2(SimpleJsonAPIResult, `${this.Dealer_API}/GetPrices`);
+
   static fetchOrders = (catalog: string | undefined) =>
-    this.fetchJson<any>(`${this.Dealer_API}/Orders?catalog=${catalog}`);
+    this.fetchJson<IOrdersResult>(
+      `${this.Dealer_API}/Orders?catalog=${catalog}`
+    );
 
   static fetchOrderById = (orderId: string) =>
-    this.fetchJson<any>(`${this.Dealer_API}/Order?orderId=${orderId}`);
+    this.fetchJson<IDealerOrder>(`${this.Dealer_API}/Order?orderId=${orderId}`);
 
   static fetchOrdersByOwner = (owner: string) =>
-    this.fetchJson<any>(`${this.Dealer_API}/OrdersByOwner?ownerId=${owner}`);
+    this.fetchJson<IOwnerOrder[]>(
+      `${this.Dealer_API}/OrdersByOwner?ownerId=${owner}`
+    );
 
   static fetchTradesByOwner = (owner: string) =>
-    this.fetchJson<any>(`${this.Dealer_API}/TradesByOwner?ownerId=${owner}`);
-
-  static fetchDealer = () => this.fetchJson<any>(`${this.Dealer_API}/Dealer`);
-  static uploadFile = (formData: FormData) =>
-    this.postJson<any>(
-      `${this.Dealer_API}/UploadFile`,
-      JSON.stringify(formData),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }
+    this.fetchJson<IOwnerTrade[]>(
+      `${this.Dealer_API}/TradesByOwner?ownerId=${owner}`
     );
+
+  static fetchDealer = () =>
+    this.fetchJson<IDealerInfo>(`${this.Dealer_API}/Dealer`);
+
+  static uploadFile = async (theForm: FormData): Promise<ImageUploadResult> => {
+    const url = `${this.Dealer_API}/UploadFile`;
+    console.log("uploading file to " + url);
+    const ret = await axios.post(url, theForm, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      timeout: 300000 // 5 minutes
+    });
+    const jsonString = ret.data;
+    const data = JSON.parse(jsonString) as ImageUploadResult;
+    return data;
+    // const result = plainToClass(ImageUploadResult, ret.text());
+    // return result;
+  };
 
   // Starter API
   static createNFTMeta = (
@@ -177,15 +330,15 @@ export class BlockchainAPI {
     imgUrl: string
   ) => {
     const data = {
-      [accountId]: accountId,
-      [signature]: signature,
-      signatureType: "der",
+      accountId: accountId,
+      signature: signature,
       name: name,
       description: description,
       imgUrl: imgUrl
     };
 
-    this.postJson<any>(
+    // just to get a url. so use ImageUploadResult as a hack
+    return this.postJson<ImageUploadResult>(
       `${this.Start_API}/CreateMetaHosted`,
       JSON.stringify(data)
     );

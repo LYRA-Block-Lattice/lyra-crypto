@@ -23,7 +23,7 @@ import {
   NonFungibleTokenTypes,
   Tags
 } from "./blocks/meta";
-const stringify = require("./my-json-stringify");
+import stringify from "./my-json-stringify";
 
 import { LyraCrypto } from "./lyra-crypto";
 import { BlockchainAPI } from "./blockchain-api";

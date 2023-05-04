@@ -12,8 +12,8 @@ import {
   ProfitingType
 } from "./meta";
 
-const stringify = require("../my-json-stringify");
-var JSONbig = require("json-bigint");
+import stringify from "../my-json-stringify";
+import JSONbig from "json-bigint";
 
 const maxInt64 = BigInt("9223372036854775807");
 export const toBalanceBigInt = (balance: bigint): bigint =>

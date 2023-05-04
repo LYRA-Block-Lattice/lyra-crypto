@@ -1,10 +1,10 @@
 // change require to import
-var KJUR = require("jsrsasign");
 import * as bs58 from "bs58";
 import { TextEncoder } from "web-encoding";
 import { convertDerToP1393 } from "./asn1";
 import * as asn1lib from "asn1js";
 
+var KJUR = require("jsrsasign");
 export class LyraCrypto {
   private static fromHexString(hexString: string) {
     var mt = hexString.match(/.{1,2}/g);

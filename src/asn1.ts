@@ -1,4 +1,4 @@
-const bigintConversion = require("bigint-conversion");
+import * as bigintConversion from "bigint-conversion";
 import { Buffer } from "buffer";
 
 export function decodeASN1Sequence(encoded: string): bigint[] {

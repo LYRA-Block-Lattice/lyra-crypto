@@ -1,5 +1,5 @@
 import { Block } from "./block";
-var JSONbig = require("json-bigint");
+import JSONbig from "json-bigint";
 
 export interface Amounts {
   [key: string]: number;

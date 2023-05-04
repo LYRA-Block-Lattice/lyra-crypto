@@ -2,8 +2,7 @@ import { LyraApi } from "../lyra-api";
 import { LyraCrypto } from "../lyra-crypto";
 import { APIResult } from "./meta";
 
-const stringify = require("../../my-json-stringify");
-var JSONbig = require("json-bigint");
+import stringify from "../my-json-stringify.js";
 
 export class DealMessage {
   PrevHash: string;

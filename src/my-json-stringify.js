@@ -1,13 +1,13 @@
 "use strict";
 
-var JSONbig = require("json-bigint");
+const JSONbig = require("json-bigint");
 
-var jsonStringify = function (obj) {
+const jsonStringify = function (obj) {
   return JSONbig.stringify(obj);
 };
 
-var isArray = require("isarray");
-var objectKeys = require("object-keys");
+const isArray = require("isarray");
+const objectKeys = require("object-keys");
 
 module.exports = function (obj, opts) {
   if (!opts) {

@@ -1771,6 +1771,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/isarray@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/isarray/-/isarray-2.0.0.tgz#933f829fc3d62743c2767280fe42fe9419a5af40"
+  integrity sha512-NHg6zbZBs+BHKCFr9iQec3k6DFqNIBdAZRPdeChYG7zFn02mJ2mLjo0rBpEoBuKa64hAy8y24RJ7q0RAUujYCQ==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.4"
   resolved "https://registry.npmjs.org/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz"
@@ -1797,6 +1802,11 @@
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
+
+"@types/json-bigint@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/json-bigint/-/json-bigint-1.0.1.tgz#201062a6990119a8cc18023cfe1fed12fc2fc8a7"
+  integrity sha512-zpchZLNsNuzJHi6v64UBoFWAvQlPhch7XAi36FkH6tL1bbbmimIF+cS7vwkzY4u5RaSWMoflQfu+TshMPPw8uw==
 
 "@types/json-schema@*", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.11"
@@ -1832,6 +1842,11 @@
   version "18.11.18"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz"
   integrity sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==
+
+"@types/object-keys@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/object-keys/-/object-keys-1.0.1.tgz#fc8afe752f647d5ae57209cc8cbfd35eb49f5ac3"
+  integrity sha512-jQiWwiScwN0AqKA9lnuQ6Ivioczb0wLqkB9H8gpf4adN1F4kDuO7kb5kC2x00AtpCHiXSp8kQgE2pWe17CyvXw==
 
 "@types/prettier@^2.1.5":
   version "2.7.2"
@@ -2425,7 +2440,7 @@ batch@0.6.1:
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
   integrity sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==
 
-bigint-conversion@^2.2.1:
+bigint-conversion@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/bigint-conversion/-/bigint-conversion-2.4.1.tgz#b473c39edbba9f62922908b37fd3461bec3bc9cb"
   integrity sha512-/DTRevseMZoqN4KLkN5BryOiom0KbwYajiXG5Vo+ZcEPAO0WBZyZoYyDZSgfeq/v/oegLo9bjdndDBlExvAhBQ==

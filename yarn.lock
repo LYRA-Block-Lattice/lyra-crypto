@@ -1593,10 +1593,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@juanelas/base64@^1.0.1":
-  version "1.0.5"
-  resolved "https://registry.npmjs.org/@juanelas/base64/-/base64-1.0.5.tgz"
-  integrity sha512-gTIElNo4ohMcYUZzol/Hb6DYJzphxl0b1B4egJJ+JiqxqcOcWx4XLMAB+lhWuMsMX3uR1oc5hwPusU3lgc1FkQ==
+"@juanelas/base64@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@juanelas/base64/-/base64-1.1.2.tgz#968ff0f9c48adcfa79a0802385d56a2a661cb6cd"
+  integrity sha512-mr2pfRQpWap0Uq4tlrCgp3W+Yjx1/Bpq4QJsYeAQUh1mExgyQvXz7xUhmYT2HcLLspuAL5dpnos8P2QhaCSXsQ==
 
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"
@@ -2425,12 +2425,12 @@ batch@0.6.1:
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
   integrity sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==
 
-bigint-conversion@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.npmjs.org/bigint-conversion/-/bigint-conversion-2.3.0.tgz"
-  integrity sha512-U4Yzg8ygZ3m78n9weKP/6NMxN/98Pdsw6YdnDYgQO8fffL7ila31fCZIy5lCMswr4kEcyl8bGHltcHT0QdG/MQ==
+bigint-conversion@^2.2.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/bigint-conversion/-/bigint-conversion-2.4.1.tgz#b473c39edbba9f62922908b37fd3461bec3bc9cb"
+  integrity sha512-/DTRevseMZoqN4KLkN5BryOiom0KbwYajiXG5Vo+ZcEPAO0WBZyZoYyDZSgfeq/v/oegLo9bjdndDBlExvAhBQ==
   dependencies:
-    "@juanelas/base64" "^1.0.1"
+    "@juanelas/base64" "^1.1.2"
 
 bignumber.js@^9.0.0:
   version "9.1.1"

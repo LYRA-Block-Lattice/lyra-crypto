@@ -1,6 +1,6 @@
 {
   "name": "lyra-crypto",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Crypto library and API to access Lyra Blockchain",
   "repository": "https://github.com/LYRA-Block-Lattice/lyra-crypto",
   "author": "wizdy",
@@ -36,9 +36,11 @@
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.3",
     "webpack-merge": "^5.7.3"
   },
   "scripts": {
+    "start": "webpack serve",
     "build": "tsc",
     "build:check": "tsc --noEmit",
     "lint": "eslint --fix --ext .ts .",
@@ -62,7 +64,8 @@
     ]
   },
   "dependencies": {
-    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-env": "^7.21.5",
+    "@babel/preset-react": "^7.18.6",
     "asn1js": "^3.0.5",
     "bigint-conversion": "^2.3.0",
     "class-transformer": "^0.5.1",
